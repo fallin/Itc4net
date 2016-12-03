@@ -45,6 +45,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Stamp.cs" />
     <Compile Include="StampExtensions.cs" />
+    <Compile Include="Text\Parser.cs" />
+    <Compile Include="Text\ParserException.cs" />
+    <Compile Include="Text\Scanner.cs" />
+    <Compile Include="Text\Token.cs" />
+    <Compile Include="Text\TokenKind.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

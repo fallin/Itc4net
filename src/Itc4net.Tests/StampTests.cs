@@ -1,5 +1,6 @@
 ﻿using System;
 using FluentAssertions;
+using Itc4net.Text;
 using NUnit.Framework;
 
 namespace Itc4net.Tests

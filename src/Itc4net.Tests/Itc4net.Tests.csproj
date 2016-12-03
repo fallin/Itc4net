@@ -70,6 +70,7 @@
     <Compile Include="ScenarioTests.cs" />
     <Compile Include="StampExtensionsTests.cs" />
     <Compile Include="StampTests.cs" />
+    <Compile Include="Text\ParserTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

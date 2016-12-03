@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
+using Itc4net.Text;
 
 namespace Itc4net
 {
@@ -258,6 +259,12 @@ namespace Itc4net
                     });
                 }
             );
+        }
+
+        public static Stamp Parse(string text)
+        {
+            var parser = new Parser();
+            return parser.ParseStamp(text);
         }
     }
 }
