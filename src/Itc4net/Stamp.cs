@@ -49,9 +49,11 @@ namespace Itc4net
         //}
 
         /// <summary>
-        /// Clone the stamp. Creates a new identity and copies the causal history.
+        /// Fork a stamp into 2 distinct stamps (returns a 2-tuple)
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// A 2-tuple, each with a unique identity and a copy of the causal history.
+        /// </returns>
         [Pure]
         public Tuple<Stamp, Stamp> Fork()
         {
