@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
 using Itc4net.Text;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 namespace Itc4net.Tests
 {
@@ -262,5 +264,269 @@ namespace Itc4net.Tests
             // Act & Assert
             s.Leq(s).Should().BeTrue();
         }
+
+        [Test]
+        public void ToBinaryShouldReturnEncodedBytesForSeedStamp()
+        {
+            // Arrange
+            Stamp s = new Stamp(); // (1,0)
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0x30 });
+            // 00110000 = 0x30
+            // ^^^      id
+            //    ^^^^  event
+        }
+
+        [Test]
+        public void ToBinaryShouldReturnEncodedBytesForAnonymousStampWithZeroEventLeaf()
+        {
+            // Arrange
+            Stamp s = new Stamp(0, 0); // (0,0)
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0x10 });
+            // 00010000 = 0x10
+            // ^^^      id
+            //    ^^^^  event
+        }
+
+        [Test]
+        public void ToBinaryShouldReturnEncodedBytesForIdNode0I()
+        {
+            // Arrange
+            Stamp s = new Stamp(new Id.Node(0, 1), 0);
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0x4C, 0x00 });
+            // 01001100 00000000 = 0x4C 0x00
+            // ^^^^^             id
+            //      ^^^ ^        event
+        }
+
+        [Test]
+        public void ToBinaryShouldReturnEncodedBytesForIdNodeI0()
+        {
+            // Arrange
+            Stamp s = new Stamp(new Id.Node(1, 0), 0);
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0x8C, 0x00 });
+            // 10001100 00000000 = 0x8C 0x00
+            // ^^^^^             id
+            //      ^^^ ^        event
+        }
+
+        [Test]
+        public void ToBinaryShouldReturnEncodedBytesForIdNode1001()
+        {
+            // Arrange
+            Stamp s = new Stamp(new Id.Node(new Id.Node(1, 0), new Id.Node(0, 1)), 0);
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0xE2, 0x98 });
+            // 11100010 10011000 = 0xE2 0x98
+            // ^^^^^^^^ ^^^^     id
+            //              ^^^^ event
+        }
+
+        [Test]
+        public void ToBinaryShouldReturnEncodedBytesForEventNode00E()
+        {
+            // Arrange
+            Stamp s = new Stamp(0, new Event.Node(0, 0, 1));
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0x02, 0x40 });
+            // 00000010 01000000 = 0x02 0x40
+            // ^^^               id
+            //    ^^^^^ ^^       event
+        }
+
+        [Test]
+        public void ToBinaryShouldReturnEncodedBytesForEventNode0E0()
+        {
+            // Arrange
+            Stamp s = new Stamp(0, new Event.Node(0, 1, 0));
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0x06, 0x40 });
+            // 00000110 01000000 = 0x06 0x40
+            // ^^^               id
+            //    ^^^^^ ^^       event
+        }
+
+        [Test]
+        // ReSharper disable once InconsistentNaming
+        public void ToBinaryShouldReturnEncodedBytesForEventNode0EEWithNestedEventLeaf()
+        {
+            // Arrange
+            Stamp s = new Stamp(0, new Event.Node(0, 1, 1));
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0x0A, 0x64 });
+            // 00001010 01100100 = 0x0A 0x64
+            // ^^^               id
+            //    ^^^^^ ^^^^^^   event
+        }
+
+        [Test]
+        // ReSharper disable once InconsistentNaming
+        public void ToBinaryShouldReturnEncodedBytesForEventNode0EEWithNestedEventNode()
+        {
+            // Arrange
+            Stamp s = new Stamp(0, new Event.Node(0, new Event.Node(0, 1, 0), 1));
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0x08, 0xCC, 0x80 });
+            // 00001000 11001100 10000000 = 0x08 0xCC 0x80
+            // ^^^                        id
+            //    ^^^^^ ^^^^^^^^ ^        event
+        }
+
+        [Test]
+        // ReSharper disable once InconsistentNaming
+        public void ToBinaryShouldReturnEncodedBytesForEventNodeN0E()
+        {
+            // Arrange
+            Stamp s = new Stamp(0, new Event.Node(1, 0, 1));
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0x0C, 0x99 });
+            // 00001100 10011001 = 0x0C 0x99
+            // ^^^               id
+            //    ^^^^^ ^^^^^^^^ event
+        }
+
+        [Test]
+        // ReSharper disable once InconsistentNaming
+        public void ToBinaryShouldReturnEncodedBytesForEventNodeNE0()
+        {
+            // Arrange
+            Stamp s = new Stamp(0, new Event.Node(1, 1, 0));
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0x0D, 0x99 });
+            // 00001101 10011001 = 0x0D 0x99
+            // ^^^               id
+            //    ^^^^^ ^^^^^^^^ event
+        }
+
+        [Test]
+        // ReSharper disable once InconsistentNaming
+        public void ToBinaryShouldReturnEncodedBytesForEventNodeNEE()
+        {
+            // Arrange
+            Stamp s = new Stamp(0, new Event.Node(1, 1, new Event.Node(3, 1, 0)));
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0x0F, 0x32, 0xDB, 0x90 });
+            // 00001111 00110010 11011011 10010000 = 0x0F 0x32 0xDB 0x90
+            // ^^^                                 id
+            //    ^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^     event
+        }
+
+        [Test]
+        // ReSharper disable once InconsistentNaming
+        public void ToBinaryShouldReturnEncodedBytesForEventNodeWithLargeNCase17()
+        {
+            // Arrange
+            Stamp s = new Stamp(0, 17);
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0x1C, 0xA0 });
+            // 00011100 10100000 = 0x1C 0xA0
+            // ^^^               id
+            //    ^^^^^ ^^^^     event
+        }
+
+        [Test]
+        // ReSharper disable once InconsistentNaming
+        public void ToBinaryShouldReturnEncodedBytesForEventNodeWithLargeNCase258()
+        {
+            // Arrange
+            Stamp s = new Stamp(0, 258);
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0x1F, 0xC0, 0xC0 });
+            // 00011111 11000000 11000000 = 0x1F 0xC0 0xC0
+            // ^^^                        id
+            //    ^^^^^ ^^^^^^^^ ^^^      event
+        }
+
+        [Test]
+        public void ToBinaryShouldReturnEncodedBytesForStampWithIdNode10AndEventNode110()
+        {
+            // Arrange
+            Stamp s = new Stamp(new Id.Node(1, 0), new Event.Node(1, 1, 0));
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0x8B, 0x66, 0x40 });
+            // 10001011 01100110 01000000 = 0x8B 66 40
+            // ^^^^^                      id
+            //      ^^^ ^^^^^^^^ ^^       event
+        }
+
+        [Test]
+        public void ToBinaryShouldReturnEncodedBytesForStampWithIdNode01AndEventNode110()
+        {
+            // Arrange
+            Stamp s = new Stamp(new Id.Node(0, 1), new Event.Node(1, 1, 0));
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0x4B, 0x66, 0x40 });
+            // 01001011 01100110 01000000 = 0x4B 66 40
+            // ^^^^^                      id
+            //      ^^^ ^^^^^^^^ ^^       event
+        }
+
     }
 }

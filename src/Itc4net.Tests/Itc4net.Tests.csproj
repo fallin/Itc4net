@@ -64,6 +64,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="BitWriterTests.cs" />
     <Compile Include="EventTests.cs" />
     <Compile Include="IdTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

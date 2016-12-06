@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Runtime.InteropServices;
+using Itc4net.Binary;
 
 namespace Itc4net
 {
@@ -10,6 +12,7 @@ namespace Itc4net
         internal abstract Id Normalize();
         internal abstract Node Split();
         internal abstract Id Sum(Id i2);
+        internal abstract void WriteTo(BitWriter writer);
 
         public class Leaf : Id
         {
@@ -69,6 +72,12 @@ namespace Itc4net
             public override int GetHashCode()
             {
                 return Value;
+            }
+
+            internal override void WriteTo(BitWriter writer)
+            {
+                writer.WriteBits(0, 2);
+                writer.WriteBits((byte) Value, 1);
             }
         }
 
@@ -137,6 +146,26 @@ namespace Itc4net
                     v2 => v2 == 0 ? this : i2,
                     (l2, r2) => new Node(Sum(l1, l2), Sum(r1, r2)).Normalize()
                 );
+            }
+
+            internal override void WriteTo(BitWriter writer)
+            {
+                if (L == 0)
+                {
+                    writer.WriteBits(1, 2);
+                    R.WriteTo(writer);
+                }
+                else if (R == 0)
+                {
+                    writer.WriteBits(2, 2);
+                    L.WriteTo(writer);
+                }
+                else
+                {
+                    writer.WriteBits(3, 2);
+                    L.WriteTo(writer);
+                    R.WriteTo(writer);
+                }
             }
 
             public override string ToString()

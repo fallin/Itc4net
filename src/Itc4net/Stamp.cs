@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Diagnostics.Contracts;
+using System.IO;
+using Itc4net.Binary;
 using Itc4net.Text;
 
 namespace Itc4net
@@ -267,6 +270,20 @@ namespace Itc4net
         {
             var parser = new Parser();
             return parser.ParseStamp(text);
+        }
+
+        public byte[] ToBinary()
+        {
+            using (var stream = new MemoryStream())
+            {
+                using (var writer = new BitWriter(stream, leaveOpen: true))
+                {
+                    _i.WriteTo(writer);
+                    _e.WriteTo(writer);
+                }
+
+                return stream.ToArray();
+            }
         }
     }
 }
