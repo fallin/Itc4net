@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Itc4net.Binary
 {
-    public class BitWriter : IDisposable
+    class BitWriter : IDisposable
     {
         readonly Stream _stream;
         readonly bool _leaveOpen;
@@ -27,23 +27,23 @@ namespace Itc4net.Binary
             _currentByte = 0;
         }
 
-        public void WriteBits(byte value, byte bits)
+        public void WriteBits(byte value, byte bitCount)
         {
-            if (bits > 8)
+            if (bitCount > 8)
             {
-                throw new ArgumentOutOfRangeException(nameof(bits), bits, "Must be between 0 and 8 (inclusive).");
+                throw new ArgumentOutOfRangeException(nameof(bitCount), bitCount, "Must be between 0 and 8 (inclusive).");
             }
 
-            value = (byte) (value & CreateMask(bits));
+            value = (byte) (value & CreateMask(bitCount));
 
-            int shift = 8 - _relativePosition - bits;
+            int shift = 8 - _relativePosition - bitCount;
             byte writeValue = shift > 0 ? (byte)(value << shift) : (byte)(value >> Math.Abs(shift));
 
             _currentByte |= writeValue;
 
             if (shift > 0)
             {
-                _relativePosition += bits;
+                _relativePosition += bitCount;
             }
             else
             {
@@ -140,8 +140,6 @@ namespace Itc4net.Binary
                 {
                     Flush();
 
-                    // free other managed objects that implement
-                    // IDisposable only
                     if (_leaveOpen)
                     {
                         _stream.Flush();

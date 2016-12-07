@@ -272,6 +272,10 @@ namespace Itc4net
             return parser.ParseStamp(text);
         }
 
+        /// <summary>
+        /// Returns a compact binary encoding that represents the current ITC timestamp.
+        /// </summary>
+        /// <returns>System.Byte[].</returns>
         public byte[] ToBinary()
         {
             using (var stream = new MemoryStream())
@@ -283,6 +287,14 @@ namespace Itc4net
                 }
 
                 return stream.ToArray();
+            }
+        }
+
+        public static Stamp FromBinary(byte[] bytes)
+        {
+            using (var decoder = new Decoder())
+            {
+                return decoder.DecodeStamp(bytes);
             }
         }
     }
