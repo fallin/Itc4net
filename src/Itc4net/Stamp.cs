@@ -266,6 +266,11 @@ namespace Itc4net
             );
         }
 
+        /// <summary>
+        /// Converts the text encoding of an ITC stamp to its object equivalent.
+        /// </summary>
+        /// <param name="text">A string containing an ITC stamp text encoding.</param>
+        /// <returns>An ITC stamp equivalent to the text contained in <para>text</para>.</returns>
         public static Stamp Parse(string text)
         {
             var parser = new Parser();
@@ -273,28 +278,33 @@ namespace Itc4net
         }
 
         /// <summary>
-        /// Returns a compact binary encoding that represents the current ITC timestamp.
+        /// Converts an ITC stamp to its equivalent binary encoding.
         /// </summary>
-        /// <returns>System.Byte[].</returns>
+        /// <returns>A binary encoding of the ITC stamp.</returns>
         public byte[] ToBinary()
         {
             using (var stream = new MemoryStream())
             {
                 using (var writer = new BitWriter(stream, leaveOpen: true))
                 {
-                    _i.WriteTo(writer);
-                    _e.WriteTo(writer);
+                    _i.Encode(writer);
+                    _e.Encode(writer);
                 }
 
                 return stream.ToArray();
             }
         }
 
+        /// <summary>
+        /// Converts the binary encoding of an ITC stamp to its object equivalent.
+        /// </summary>
+        /// <param name="bytes">A byte[] containing an ITC stamp binary encoding.</param>
+        /// <returns>An ITC stamp equivalent to the bytes contained in <para>bytes</para>.</returns>
         public static Stamp FromBinary(byte[] bytes)
         {
             using (var decoder = new Decoder())
             {
-                return decoder.DecodeStamp(bytes);
+                return decoder.Decode(bytes);
             }
         }
     }

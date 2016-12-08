@@ -11,7 +11,6 @@ namespace Itc4net.Binary
         byte[] _bytes;
         BitReader _reader;
         bool _disposed;
-
         int _currentPosition;
 
         public Decoder()
@@ -19,28 +18,54 @@ namespace Itc4net.Binary
             _reader = null;
         }
 
-        public Stamp DecodeStamp(byte[] bytes)
+        public Stamp Decode(byte[] bytes)
         {
             if (bytes == null) throw new ArgumentNullException(nameof(bytes));
 
             _bytes = bytes;
             _reader = new BitReader(bytes);
 
-            return DecodeStamp();
+            Id i = DecodeId();
+            Event e = DecodeEvent();
+
+            return new Stamp(i, e);
+        }
+
+        string DescribeBytes()
+        {
+            if (_bytes == null)
+            {
+                return "(null)";
+            }
+
+            if (_bytes.Length == 0)
+            {
+                return "(empty)";
+            }
+
+            return BitConverter.ToString(_bytes);
         }
 
         void ThrowUnexpected(int unexpected)
         {
             int errorPosition = _currentPosition;
-            string error = $"Error parsing \"{_bytes.Hexify()}\". Unexpected value 0x{unexpected:X2} at bit index {errorPosition}.";
+            string error = $"Error parsing {DescribeBytes()}. Unexpected value 0x{unexpected:X2} at bit index {errorPosition}.";
 
             throw new DecoderException(error, null, unexpected, errorPosition);
+        }
+
+        void ThrowUnexpectedEndOfStream()
+        {
+            int errorPosition = _currentPosition;
+            string error = $"Error parsing {DescribeBytes()}. Unexpected EndOfStream at bit index {errorPosition}.";
+
+            throw new DecoderException(error, null, BitProcessor.EndOfStream, errorPosition);
         }
 
         void ThrowExpected(int expecting, int found)
         {
             int errorPosition = _currentPosition;
-            string error = $"Error parsing \"{_bytes.Hexify()}\". Expecting value 0x{expecting:X2}"
+            string error = $"Error parsing {DescribeBytes()}. Expecting value 0x{expecting:X2}"
                            + $", yet found 0x{found:X2} @ bit index {errorPosition}";
 
             throw new DecoderException(error, expecting, found, errorPosition);
@@ -56,17 +81,9 @@ namespace Itc4net.Binary
                 return value;
             }
 
-            _currentPosition += readBits;
-            ThrowUnexpected(-1);
+            _currentPosition += Math.Max(readBits, 0);
+            ThrowUnexpectedEndOfStream();
             return 0;
-        }
-
-        Stamp DecodeStamp()
-        {
-            Id i = DecodeId();
-            Event e = DecodeEvent();
-
-            return new Stamp(i, e);
         }
 
         Id DecodeId()

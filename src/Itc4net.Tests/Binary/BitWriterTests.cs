@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Itc4net.Binary;
-using NSubstitute;
 using NUnit.Framework;
 
-namespace Itc4net.Tests
+namespace Itc4net.Tests.Binary
 {
     [TestFixture]
     public class BitWriterTests
@@ -29,6 +24,23 @@ namespace Itc4net.Tests
         }
 
         [Test]
+        public void WriteBitsShouldBeAbleToWriteSuccessive8Bits()
+        {
+            byte[] bytes = new byte[2];
+            using (var writer = new BitWriter(new MemoryStream(bytes)))
+            {
+                writer.WriteBits(0xFF, 8); // 11111111
+                //                            ^^^^^^^^
+
+                writer.WriteBits(0xAA, 8); // 10101010
+                //                            ^^^^^^^^
+            }
+
+            bytes[0].Should().Be(0xFF);
+            bytes[1].Should().Be(0xAA);
+        }
+
+        [Test]
         public void WriteBitsShouldBeAbleToWrite5Bits()
         {
             byte[] bytes = new byte[2];
@@ -38,8 +50,32 @@ namespace Itc4net.Tests
                 //                               ^^^^^
             }
 
+            // 11111000 = 0xF8
+            // ^^^^^    = 1st 5 bits
+
             bytes[0].Should().Be(0xF8);
             bytes[1].Should().Be(0x00);
+        }
+
+        [Test]
+        public void WriteBitsShouldBeAbleToWriteSuccessive5Bits()
+        {
+            byte[] bytes = new byte[2];
+            using (var writer = new BitWriter(new MemoryStream(bytes)))
+            {
+                writer.WriteBits(0xFF, 5); // 11111111
+                //                               ^^^^^
+
+                writer.WriteBits(0xAA, 5); // 10101010
+                //                               ^^^^^
+            }
+
+            // 11111010 10000000 = 0xFA 0x80
+            // ^^^^^             = 1st 5 bits
+            //      ^^^ ^^       = 2nd 5 bits
+
+            bytes[0].Should().Be(0xFA);
+            bytes[1].Should().Be(0x80);
         }
 
         [Test]
@@ -57,6 +93,27 @@ namespace Itc4net.Tests
         }
 
         [Test]
+        public void WriteBitsShouldBeAbleToWriteSuccessive3Bits()
+        {
+            byte[] bytes = new byte[2];
+            using (var writer = new BitWriter(new MemoryStream(bytes)))
+            {
+                writer.WriteBits(0xFF, 3);  // 11111111
+                //                                  ^^^
+
+                writer.WriteBits(0xAA, 3);  // 10101010
+                //                                  ^^^
+            }
+
+            // 11101000 = 0xE8
+            // ^^^      = 1st 3 bits
+            //    ^^^   = 2nd 3 bits
+
+            bytes[0].Should().Be(0xE8);
+            bytes[1].Should().Be(0x00);
+        }
+
+        [Test]
         public void WriteBitsShouldBeAbleToWrite0Bits()
         {
             byte[] bytes = new byte[2];
@@ -70,27 +127,7 @@ namespace Itc4net.Tests
         }
 
         [Test]
-        public void WriteBitsShouldBeAbleToWrite5BitsThen5Bits()
-        {
-            byte[] bytes = new byte[2];
-            using (var writer = new BitWriter(new MemoryStream(bytes)))
-            {
-                writer.WriteBits(0xAA, 5); // 10101010
-                //                               ^^^^^
-                writer.WriteBits(0xAA, 5); // 10101010
-                //                               ^^^^^
-            }
-
-            // 01010010 10xxxxxx = 0x52 0x80
-            // ^^^^^             <- 5 bits
-            //      ^^^ ^^       <- 5 bits
-
-            bytes[0].Should().Be(0x52);
-            bytes[1].Should().Be(0x80);
-        }
-
-        [Test]
-        public void WriteBitsShouldBeAbleToWrite5BitsThen4BitsThen2Bits()
+        public void WriteBitsShouldBeAbleToWriteSuccesive5BitsThen4BitsThen2Bits()
         {
             byte[] bytes = new byte[2];
             using (var writer = new BitWriter(new MemoryStream(bytes)))
@@ -104,9 +141,9 @@ namespace Itc4net.Tests
             }
 
             // 01010101 010xxxxx = 0x55 0x40
-            // ^^^^^             <- 5 bits
-            //      ^^^ ^        <- 4 bits
-            //           ^^      <- 2 bits
+            // ^^^^^             = 1st 5 bits
+            //      ^^^ ^        = 2nd 4 bits
+            //           ^^      = 3rd 2 bits
 
             bytes[0].Should().Be(0x55);
             bytes[1].Should().Be(0x40);

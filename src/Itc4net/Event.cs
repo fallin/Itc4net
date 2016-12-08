@@ -16,7 +16,7 @@ namespace Itc4net
         internal abstract int Min();
         internal abstract int Max();
         internal abstract Event Join(Event e2);
-        internal abstract void WriteTo(BitWriter writer);
+        internal abstract void Encode(BitWriter writer);
 
         public sealed class Leaf : Event
         {
@@ -87,7 +87,7 @@ namespace Itc4net
                 );
             }
 
-            internal override void WriteTo(BitWriter writer)
+            internal override void Encode(BitWriter writer)
             {
                 writer.EncodeN(N);
             }
@@ -199,26 +199,26 @@ namespace Itc4net
                 );
             }
 
-            internal override void WriteTo(BitWriter writer)
+            internal override void Encode(BitWriter writer)
             {
                 if (N == 0 && L == 0)
                 {
                     writer.WriteBits(0, 1);
                     writer.WriteBits(0, 2);
-                    R.WriteTo(writer);
+                    R.Encode(writer);
                 }
                 else if (N == 0 && R == 0)
                 {
                     writer.WriteBits(0, 1);
                     writer.WriteBits(1, 2);
-                    L.WriteTo(writer);
+                    L.Encode(writer);
                 }
                 else if (N == 0)
                 {
                     writer.WriteBits(0, 1);
                     writer.WriteBits(2, 2);
-                    L.WriteTo(writer);
-                    R.WriteTo(writer);
+                    L.Encode(writer);
+                    R.Encode(writer);
                 }
                 else if (L == 0)
                 {
@@ -227,7 +227,7 @@ namespace Itc4net
                     writer.WriteBits(0, 1);
                     writer.WriteBits(0, 1);
                     writer.EncodeN(N);
-                    R.WriteTo(writer);
+                    R.Encode(writer);
                 }
                 else if (R == 0)
                 {
@@ -236,7 +236,7 @@ namespace Itc4net
                     writer.WriteBits(0, 1);
                     writer.WriteBits(1, 1);
                     writer.EncodeN(N);
-                    L.WriteTo(writer);
+                    L.Encode(writer);
                 }
                 else
                 {
@@ -244,8 +244,8 @@ namespace Itc4net
                     writer.WriteBits(3, 2);
                     writer.WriteBits(1, 1);
                     writer.EncodeN(N);
-                    L.WriteTo(writer);
-                    R.WriteTo(writer);
+                    L.Encode(writer);
+                    R.Encode(writer);
                 }
             }
         }

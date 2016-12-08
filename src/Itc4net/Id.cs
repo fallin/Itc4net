@@ -12,7 +12,7 @@ namespace Itc4net
         internal abstract Id Normalize();
         internal abstract Node Split();
         internal abstract Id Sum(Id i2);
-        internal abstract void WriteTo(BitWriter writer);
+        internal abstract void Encode(BitWriter writer);
 
         public class Leaf : Id
         {
@@ -74,7 +74,7 @@ namespace Itc4net
                 return Value;
             }
 
-            internal override void WriteTo(BitWriter writer)
+            internal override void Encode(BitWriter writer)
             {
                 writer.WriteBits(0, 2);
                 writer.WriteBits((byte) Value, 1);
@@ -148,23 +148,23 @@ namespace Itc4net
                 );
             }
 
-            internal override void WriteTo(BitWriter writer)
+            internal override void Encode(BitWriter writer)
             {
                 if (L == 0)
                 {
                     writer.WriteBits(1, 2);
-                    R.WriteTo(writer);
+                    R.Encode(writer);
                 }
                 else if (R == 0)
                 {
                     writer.WriteBits(2, 2);
-                    L.WriteTo(writer);
+                    L.Encode(writer);
                 }
                 else
                 {
                     writer.WriteBits(3, 2);
-                    L.WriteTo(writer);
-                    R.WriteTo(writer);
+                    L.Encode(writer);
+                    R.Encode(writer);
                 }
             }
 
