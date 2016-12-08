@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Diagnostics.Contracts;
+using System.IO;
+using Itc4net.Binary;
 using Itc4net.Text;
 
 namespace Itc4net
@@ -263,10 +266,46 @@ namespace Itc4net
             );
         }
 
+        /// <summary>
+        /// Converts the text encoding of an ITC stamp to its object equivalent.
+        /// </summary>
+        /// <param name="text">A string containing an ITC stamp text encoding.</param>
+        /// <returns>An ITC stamp equivalent to the text contained in <para>text</para>.</returns>
         public static Stamp Parse(string text)
         {
             var parser = new Parser();
             return parser.ParseStamp(text);
+        }
+
+        /// <summary>
+        /// Converts an ITC stamp to its equivalent binary encoding.
+        /// </summary>
+        /// <returns>A binary encoding of the ITC stamp.</returns>
+        public byte[] ToBinary()
+        {
+            using (var stream = new MemoryStream())
+            {
+                using (var writer = new BitWriter(stream, leaveOpen: true))
+                {
+                    _i.Encode(writer);
+                    _e.Encode(writer);
+                }
+
+                return stream.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Converts the binary encoding of an ITC stamp to its object equivalent.
+        /// </summary>
+        /// <param name="bytes">A byte[] containing an ITC stamp binary encoding.</param>
+        /// <returns>An ITC stamp equivalent to the bytes contained in <para>bytes</para>.</returns>
+        public static Stamp FromBinary(byte[] bytes)
+        {
+            using (var decoder = new Decoder())
+            {
+                return decoder.Decode(bytes);
+            }
         }
     }
 }

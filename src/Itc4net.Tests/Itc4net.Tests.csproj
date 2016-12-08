@@ -64,6 +64,9 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="Binary\BitReaderTests.cs" />
+    <Compile Include="Binary\DecoderTests.cs" />
+    <Compile Include="Binary\BitWriterTests.cs" />
     <Compile Include="EventTests.cs" />
     <Compile Include="IdTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
+using Itc4net.Binary;
 
 namespace Itc4net
 {
@@ -14,6 +16,7 @@ namespace Itc4net
         internal abstract int Min();
         internal abstract int Max();
         internal abstract Event Join(Event e2);
+        internal abstract void Encode(BitWriter writer);
 
         public sealed class Leaf : Event
         {
@@ -82,6 +85,11 @@ namespace Itc4net
                     n2 => new Leaf(Math.Max(n1, n2)),
                     (n2, l2, r2) => Join(new Node(n1, 0, 0), e2)
                 );
+            }
+
+            internal override void Encode(BitWriter writer)
+            {
+                writer.EncodeN(N);
             }
         }
 
@@ -189,6 +197,56 @@ namespace Itc4net
                         return e.Normalize();
                     }
                 );
+            }
+
+            internal override void Encode(BitWriter writer)
+            {
+                if (N == 0 && L == 0)
+                {
+                    writer.WriteBits(0, 1);
+                    writer.WriteBits(0, 2);
+                    R.Encode(writer);
+                }
+                else if (N == 0 && R == 0)
+                {
+                    writer.WriteBits(0, 1);
+                    writer.WriteBits(1, 2);
+                    L.Encode(writer);
+                }
+                else if (N == 0)
+                {
+                    writer.WriteBits(0, 1);
+                    writer.WriteBits(2, 2);
+                    L.Encode(writer);
+                    R.Encode(writer);
+                }
+                else if (L == 0)
+                {
+                    writer.WriteBits(0, 1);
+                    writer.WriteBits(3, 2);
+                    writer.WriteBits(0, 1);
+                    writer.WriteBits(0, 1);
+                    writer.EncodeN(N);
+                    R.Encode(writer);
+                }
+                else if (R == 0)
+                {
+                    writer.WriteBits(0, 1);
+                    writer.WriteBits(3, 2);
+                    writer.WriteBits(0, 1);
+                    writer.WriteBits(1, 1);
+                    writer.EncodeN(N);
+                    L.Encode(writer);
+                }
+                else
+                {
+                    writer.WriteBits(0, 1);
+                    writer.WriteBits(3, 2);
+                    writer.WriteBits(1, 1);
+                    writer.EncodeN(N);
+                    L.Encode(writer);
+                    R.Encode(writer);
+                }
             }
         }
 

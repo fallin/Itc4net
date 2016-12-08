@@ -40,11 +40,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Binary\BitProcessor.cs" />
+    <Compile Include="Binary\DecoderException.cs" />
+    <Compile Include="Binary\BitReader.cs" />
+    <Compile Include="Binary\BitWriter.cs" />
+    <Compile Include="Binary\BitWriterExtensions.cs" />
     <Compile Include="Event.cs" />
     <Compile Include="Id.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Stamp.cs" />
     <Compile Include="StampExtensions.cs" />
+    <Compile Include="Binary\Decoder.cs" />
     <Compile Include="Text\Parser.cs" />
     <Compile Include="Text\ParserException.cs" />
     <Compile Include="Text\Scanner.cs" />
