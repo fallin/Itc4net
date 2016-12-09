@@ -136,7 +136,7 @@ namespace Itc4net.Tests.Binary
                 int bitsRead3 = reader.ReadBits(5, out b3); // 01010101 -------- (beyond end of stream)
                                                             //            ^^^^^^ ~~> 0x00
                 b3.Should().Be(0x00);
-                bitsRead3.Should().Be(-1);
+                bitsRead3.Should().Be(0);
             }
         }
     }

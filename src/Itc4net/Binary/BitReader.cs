@@ -26,48 +26,42 @@ namespace Itc4net.Binary
                 throw new ArgumentOutOfRangeException(nameof(bitCount), bitCount, "Must be between 0 and 8 (inclusive).");
             }
 
-            // Attempt to read the next byte to prime the _currentByte
+            // Attempt to read the next byte to prime CurrentByte
             if (CurrentByte == EndOfStream)
             {
                 CurrentByte = BaseStream.ReadByte();
             }
 
-            int readBits;
-            int currentBits = 0x00;
-
+            value = 0;
+            int actualBitsRead = 0;
             if (CurrentByte != EndOfStream)
             {
-                RelativePosition += bitCount;
-                int shift = 8 - RelativePosition;
-                currentBits |= shift > 0 ? (byte)(CurrentByte >> shift) : (byte)(CurrentByte << Math.Abs(shift));
-                readBits = bitCount;
+                int shift = 8 - RelativePosition - bitCount;
+                value = shift > 0 ? (byte)(CurrentByte >> shift) : (byte)(CurrentByte << Math.Abs(shift));
+                value = (byte) (value & CreateMask(bitCount));
+                actualBitsRead += bitCount;
 
-                // Adjust when moving beyond byte boundary
-                if (RelativePosition > 7)
+                if (shift > 0)
                 {
-                    RelativePosition %= 8;
+                    RelativePosition += bitCount;
+                }
+                else // reached or exceeded byte boundary
+                {
+                    RelativePosition = 0;
                     CurrentByte = BaseStream.ReadByte();
-                    if (CurrentByte != EndOfStream)
+
+                    if (shift < 0)
                     {
-                        shift = 8 - RelativePosition;
-                        currentBits |= shift > 0 ? (byte)(CurrentByte >> shift) : (byte)(CurrentByte << Math.Abs(shift));
-                    }
-                    else
-                    {
-                        readBits -= RelativePosition;
+                        actualBitsRead = bitCount + shift;
+
+                        byte remainingValue;
+                        actualBitsRead += ReadBits((byte) Math.Abs(shift), out remainingValue);
+                        value |= remainingValue;
                     }
                 }
-
-                byte mask = CreateMask(bitCount);
-                currentBits &= mask;
-            }
-            else
-            {
-                readBits = EndOfStream;
             }
 
-            value = (byte)currentBits;
-            return readBits;
+            return actualBitsRead;
         }
     }
 }
