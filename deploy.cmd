@@ -19,7 +19,7 @@ for /f %%a IN ('dir /b *.nuspec') do (
 echo info: Push NuGet nupkg
 set /p APIKEY="Enter NuGet ApiKey:"
 for /f %%b IN ('dir /b *.nupkg') do (
-	rem nuget push "%%b" -ApiKey %APIKEY%
+	nuget push "%%b" -ApiKey %APIKEY% -Source https://www.nuget.org/api/v2/package
 )
 
 mkdir .\build
