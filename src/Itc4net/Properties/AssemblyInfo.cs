@@ -35,4 +35,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
+// For tools that understand and support SemVer
+[assembly: AssemblyInformationalVersion("1.0.0-beta1")]
+
 [assembly: InternalsVisibleTo("Itc4net.Tests")]
