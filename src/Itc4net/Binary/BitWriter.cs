@@ -15,9 +15,9 @@ namespace Itc4net.Binary
             CurrentByte = 0;
         }
 
-        public void WriteBits(byte value, byte bitCount)
+        public void WriteBits(byte value, int bitCount)
         {
-            if (bitCount > 8)
+            if (bitCount < 0 || bitCount > 8)
             {
                 throw new ArgumentOutOfRangeException(nameof(bitCount), bitCount, "Must be between 0 and 8 (inclusive).");
             }

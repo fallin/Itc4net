@@ -19,9 +19,9 @@ namespace Itc4net.Binary
             CurrentByte = EndOfStream;
         }
 
-        public int ReadBits(byte bitCount, out byte value)
+        public int ReadBits(int bitCount, out byte value)
         {
-            if (bitCount > 8)
+            if (bitCount < 0 || bitCount > 8)
             {
                 throw new ArgumentOutOfRangeException(nameof(bitCount), bitCount, "Must be between 0 and 8 (inclusive).");
             }

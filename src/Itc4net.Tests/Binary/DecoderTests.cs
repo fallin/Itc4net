@@ -212,6 +212,38 @@ namespace Itc4net.Tests.Binary
         }
 
         [Test]
+        // ReSharper disable once InconsistentNaming
+        public void DecodeShouldReturnStampForEncodedEventNodeWithLargeNCase513()
+        {
+
+            // Arrange
+            byte[] bytes = { 0x1F, 0xE0, 0x28 };
+
+            // Act
+            Stamp s = _decoder.Decode(bytes);
+
+            // Assert
+            // Arrange
+            s.Should().Be(new Stamp(0, 513));
+        }
+
+        [Test]
+        // ReSharper disable once InconsistentNaming
+        public void DecodeShouldReturnStampForEncodedEventNodeWithLargeNCase21474836()
+        {
+
+            // Arrange
+            byte[] bytes = { 0x1F, 0xFF, 0xFF, 0xC8, 0xF5, 0xC3, 0x00 };
+
+            // Act
+            Stamp s = _decoder.Decode(bytes);
+
+            // Assert
+            // Arrange
+            s.Should().Be(new Stamp(0, 21474836));
+        }
+
+        [Test]
         public void DecodeShouldReturnStampForEncodedStampWithIdNode10AndEventNode110()
         {
             // Arrange

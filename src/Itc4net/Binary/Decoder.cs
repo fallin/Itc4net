@@ -70,10 +70,10 @@ namespace Itc4net.Binary
             throw new DecoderException(error, expecting, found, errorPosition);
         }
 
-        byte Scan(byte bitCount)
+        byte Scan(int bitCount)
         {
             byte value;
-            var readBits = _reader.ReadBits(bitCount, out value);
+            int readBits = _reader.ReadBits(bitCount, out value);
             if (readBits == bitCount)
             {
                 _currentPosition += bitCount;
@@ -198,7 +198,7 @@ namespace Itc4net.Binary
             return 0;
         }
 
-        int DecodeN(byte b)
+        int DecodeN(int b)
         {
             int n = 0;
 
@@ -206,7 +206,30 @@ namespace Itc4net.Binary
             switch (scan)
             {
                 case 0:
-                    n = Scan(b);
+                    if (b <= 8)
+                    {
+                        n = Scan(b);
+                    }
+                    else
+                    {
+                        // The current implementation of BitReader currently only supports
+                        // reading 0-8 bits at a time. I may fix this in the future, but
+                        // until then, just break reading 'n' into multiple writes.
+                        int remainder;
+                        int quotient = Math.DivRem(b, 8, out remainder);
+
+                        if (remainder > 0)
+                        {
+                            int value = (Scan(remainder) & 0x000000FF) << (8 * quotient);
+                            n |= value;
+                        }
+
+                        for (int index = quotient - 1; index >= 0; index--)
+                        {
+                            int value = (Scan(8) & 0x000000FF) << (8 * index);
+                            n |= value;
+                        }
+                    }
                     break;
                 case 1:
                     n = (int) (DecodeN((byte) (b + 1)) + Math.Pow(2, b));

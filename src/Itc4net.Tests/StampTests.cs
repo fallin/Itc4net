@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
+using Itc4net.Binary;
 using Itc4net.Text;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
@@ -497,6 +498,45 @@ namespace Itc4net.Tests
         }
 
         [Test]
+        // ReSharper disable once InconsistentNaming
+        public void ToBinaryShouldReturnEncodedBytesForEventNodeWithLargeNCase513()
+        {
+            // Arrange
+            Stamp s = new Stamp(0, 513);
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0x1F, 0xE0, 0x28 });
+            // 00011111 11100000 00101000 = 0x1F 0xE0 0x28
+            // ^^^                        id
+            //    ^^^^^ ^^^^^^^^ ^^^^^    event
+        }
+
+        [Test]
+        public void ToBinaryShouldReturnEncodedBytesForEventNodeWithLargeNCase21474836()
+        {
+            // This value of N requires 24 bits (3 bytes) to encode and exposed an issue
+            // related to encoding values that byte boundaries
+
+            // Arrange
+            Stamp s = new Stamp(0, 21474836);
+
+            // Act
+            byte[] bytes = s.ToBinary();
+
+            // Assert
+            bytes.ShouldBeEquivalentTo(new byte[] { 0x1F, 0xFF, 0xFF, 0xC8, 0xF5, 0xC3, 0x00 });
+
+            //
+
+            // 00011111 11111111 11111111 110‭01000 11110101 11000011 000‬00000 = 0x1F 0xFF 0xFF 0xC8 0xF5 0xC3 0x00
+            // ^^^                                                            id
+            //    ^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^      event
+        }
+
+        [Test]
         public void ToBinaryShouldReturnEncodedBytesForStampWithIdNode10AndEventNode110()
         {
             // Arrange
@@ -526,6 +566,24 @@ namespace Itc4net.Tests
             // 01001011 01100110 01000000 = 0x4B 66 40
             // ^^^^^                      id
             //      ^^^ ^^^^^^^^ ^^       event
+        }
+
+        [TestCase(0)]
+        [TestCase(21474836)] // yes, this exposed an issue
+        [TestCase(int.MaxValue)]
+        public void StampShouldBeAbleToRoundTripBinaryEncoding(int n)
+        {
+            // Arrange
+            Stamp original = new Stamp(0, n);
+
+            // Act
+            byte[] bytes = original.ToBinary();
+
+            Decoder decoder = new Decoder();
+            Stamp decoded = decoder.Decode(bytes);
+
+            // Assert
+            decoded.Should().Be(original);
         }
     }
 }

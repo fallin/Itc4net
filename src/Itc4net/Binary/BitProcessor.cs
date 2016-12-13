@@ -21,7 +21,7 @@ namespace Itc4net.Binary
         }
 
         protected Stream BaseStream => _stream;
-        protected byte RelativePosition { get; set; }
+        protected int RelativePosition { get; set; }
         protected int CurrentByte { get; set; }
 
         /// <summary>
