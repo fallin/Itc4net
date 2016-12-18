@@ -6,9 +6,9 @@ Itc4net is a C# implementation of Interval Tree Clocks (ITC), a causality tracki
 
 ### Overview
 
-This project is a C#/.NET implementation of the ideas presented in the 2008 paper, [Interval Tree Clocks: A Logical Clock for Dynamic Systems](http://gsd.di.uminho.pt/members/cbm/ps/itc2008.pdf). An Interval Tree Clock (ITC) provides a means of causality tracking in a distributed system with a dynamic number of participants and offers a way to determine the partial ordering of events, i.e., a happened-before relation.
+This project is a C#/.NET implementation of the ideas presented in the 2008 paper, [Interval Tree Clocks: A Logical Clock for Dynamic Systems](http://gsd.di.uminho.pt/members/cbm/ps/itc2008.pdf). An Interval Tree Clock (ITC) provides a means of causality tracking in a distributed system with a dynamic number of participants and offers a way to determine the partial ordering of events.
 
-The term *causality* in distributed systems originates from the concept of causality in physics where "causal connections gives us the only ordering of events that all observers will agree on" ([The Speed of Light is NOT About Light](https://youtu.be/msVuCEs8Ydo?t=44s) | [PBS Digital Studios | Space Time](https://www.youtube.com/channel/UC7_gcs09iThXybpVgjHZ_7g)). In relativity, observers moving relative to each other may not agree on the elapsed time or distance between events. Similarly, in distributed systems, a causal history (or compressed representation) is necessary to determine the partial ordering of events or the detection of inconsistent data replicas because physical clocks are unreliable.
+The term *causality* in distributed systems originates from the concept of causality in physics where "causal connections gives us the only ordering of events that all observers will agree on" ([The Speed of Light is NOT About Light](https://youtu.be/msVuCEs8Ydo?t=44s) | [PBS Digital Studios | Space Time](https://www.youtube.com/channel/UC7_gcs09iThXybpVgjHZ_7g)). In relativity, observers moving relative to each other may not agree on the elapsed time or distance between events. Although disagreements in the order of events in distributed systems are not due to moving reference frames, they share a common problem: physical clocks are inadequate to determine the order of events when involving more than one observer. There is no global clock. A causal history (or compressed representation) is necessary to determine the partial ordering of events or the detection of inconsistent data replicas because physical clocks are unreliable.
 
 ### Getting Started
 
@@ -22,13 +22,13 @@ Install-Package Itc4net -Pre
 
 #### Stamp
 
-An ITC stamp is composed of two parts: an ID and event tree (i.e., casual past). The Stamp class default constructor creates a *seed* stamp. ITC stamps use a string notation with the following form: "(i,e)"
+An ITC stamp is composed of two parts: an ID and event tree (i.e., casual past). The Stamp default constructor creates a *seed* stamp.
 
 ```c#
-Stamp seed = new Stamp(); // (1,0) <-- that's id:1, event:0
+Stamp seed = new Stamp(); // (1,0)
 ```
 
-Although it is not specified (or required) by the ITC paper, Itc4net uses immutable types for the core ITC Stamp, Id, and Event classes; therefore, the ITC kernel operations (fork, join, and event) are pure functions. As a consequence, it is important to treat the Stamp like a struct type and replace the reference with a new reference when performing any kernel operations. 
+Itc4net uses immutable types for the core ITC Stamp, Id, and Event classes; therefore, the ITC kernel operations (fork, join, and event) are pure functions. As a consequence, it is important to treat the Stamp like a struct type and replace the Stamp variable reference with a new reference when performing any kernel operations. 
 
 For example, do this:
 
@@ -48,7 +48,7 @@ s.Event();				// (1,1) oops, same as before!
 
 #### Fork
 
-The fork operation generates a pair of stamps with distinct IDs, each with a copy of the event tree. This operation is used to generate new stamps (after creating the initial seed stamp). More specifically, it splits the ID of the original stamp into two distinct IDs, so you will want to keep a reference to one stamp and share the other. In the next example, variable *s* would likely be a private member field stored in a class responsible for generating timestamps.
+The fork operation generates a pair of stamps with distinct IDs, each with a copy of the event tree. This operation is used to generate new stamps (after creating the initial seed stamp). More specifically, it splits the ID of the original stamp into two distinct IDs, so keep a reference to one stamp and share the other. In the next example, variable *s* would likely be a private member field stored in a class responsible for generating timestamps.
 
 ```c#
 Stamp s = new Stamp();
@@ -58,7 +58,7 @@ s = forked.Item1; // replace variable s with one of the generated stamps
 Stamp another = forked.Item2; // a logical clock for use by another process
 ```
 
-Since extracting multiple multiple items from tuples is awkwardly verbose, there are extension methods that provide an alternative API with out parameters, if preferred:
+Since extracting multiple multiple items from tuples is awkward, there are extension methods that provide an alternative API with out parameters, if preferred:
 
 ```c#
 Stamp s = new Stamp();
@@ -75,15 +75,46 @@ Stamp s1 = forked.Item1;    // (((1,0),0),0)
 Stamp s2 = forked.Item2;    // (((0,1),0),0)
 Stamp s3 = forked.Item3;    // ((0,(1,0)),0)
 Stamp s4 = forked.Item4;    // ((0,(0,1)),0)
+```
 
--- or alternatively --
+or, alternatively & more compactly:
 
+```
 Stamp s = new Stamp();
 Stamp s1, s2, s3, s4;
 s.Fork(out s1, out s2, out s3, out s4);
 ```
 
 *A note about logical clock identifiers: the ID of a logical clock needs to be unique in the system. Some approaches use integers which works well when there is a global authority that can hand-out identities or when the system uses a fixed number of participants. Some approaches use UUIDs (or other globally unique naming strategy) which allows any number of participants, but tracking casual histories for each participant leads to very large timestamps. Instead, ITC uses the fork operation to generate a distinct pair of IDs from an existing stamp. This allows a dynamic number of participants and eliminates the need for a global authority, as any (non-anonymous) stamp can generate new IDs.*
+
+#### Event
+
+todo
+
+#### Join
+
+todo
+
+#### Send
+
+todo
+
+#### Receive
+
+todo
+
+### Considerations & Open Questions
+
+Interval Tree Clocks are a fascinating approach to causality tracking, but ultimately the partial ordering of events (vector clocks) or the detection of inconsistent data replicas (version vectors) are combined with many other techniques within a distributed system. For example, [Amazon's Dynamo](http://s3.amazonaws.com/AllThingsDistributed/sosp/amazon-dynamo-sosp2007.pdf) paper combines many techniques, including: consistent hashing, versioning, membership protocols, failure detection, and more to form a cohesive system. Yet, this is just one example. Causality tracking, like version vectors or ITC timestamps are used in many diverse scenarios, so there is no single answer, but these questions come to mind:
+
+Obtaining or distributing stamps among participants requires careful consideration:
+
+- The basic workflow involves creating a seed stamp and using the fork operation to generate unique stamps (with distinct IDs) for each participant. Any entity requiring its own unique source of causal history will require its own stamp with a distinct ID. Who creates the seed stamp? Is it created by the initial leader of the cluster or does an administrator create the seed and pre-allocate the initial stamps during initial setup?
+- How does a process get a non-seed stamp? The fork operation generates new stamps, but presumably a process will need to perform a remote method call (or send a message) requesting an existing process to perform the fork operation and share the new stamp.
+- What happens when a participant (e.g., service process) restarts? It is not desirable to abandon a stamp because forking new stamps increases the size of all future stamps, not to mention losing the processes own unique casual past. 
+  - Should a process persist the ITC stamp so it can recover state and stamp when restarting? How often should this be done? How much causal history is it acceptable to lose? If a process maintains local storage so it can recover its state when restarting, then consider storing the ITC stamp as well. 
+  - Alternatively, if a process does not use persistent storage and must bootstrap from other participants when restarting, then consider notifying other participants, during graceful shutdown, so they can perform a join operation to recover the ID.
+- When permanently removing a participant, consider notifying other participants in the system. When a stamp contains an ID, the join operation can be used to essentially recover (sum & normalize) the ID.
 
 ### Additional Resources
 
