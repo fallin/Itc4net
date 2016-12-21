@@ -10,7 +10,7 @@ This project is a C#/.NET implementation of the ideas presented in the 2008 pape
 
 The term *causality* in distributed systems originates from the concept of causality in physics where "causal connections gives us the only ordering of events that all observers will agree on" ([The Speed of Light is NOT About Light](https://youtu.be/msVuCEs8Ydo?t=44s) | [PBS Digital Studios | Space Time](https://www.youtube.com/channel/UC7_gcs09iThXybpVgjHZ_7g)). In distributed systems, physical clocks are problematic because of drift, synchronization issues, leap seconds, and double-counting—just to name a few (see, [the trouble with timestamps](https://aphyr.com/posts/299-the-trouble-with-timestamps) more details). In short, there is no global clock. A causal history (or compressed representation) is necessary to determine the partial ordering of events or detect inconsistent data replicas because physical clocks are unreliable.
 
-It's worth mentioning, in this context, a causal relationship implies one thing could have potentially influenced another, such as, change A was known before change occurred. It's a weaker assertion than in statistics which differentiates between causation and correlation.
+It's worth mentioning, in this context, a causal relationship implies one thing could have potentially influenced another, such as, change A was known before change B occurred. It's a weaker assertion than in statistics which differentiates between causation and correlation.
 
 ### Getting Started
 
@@ -137,7 +137,7 @@ s1.ToString().Dump();
 
 Illustrating with ITC graphical notation:
 
-![join-example-diagram](https://github.com/fallin/Itc4net/blob/master/docs/img/join-example-diagram.png)
+![join-example-diagram](docs/img/join-example-diagram.png?raw=true)
 
 Joining stamps with IDs is useful when a participant leaves the system (and no longer needed) because it essentially recovers the ID and has the potential to reduce the size of the stamp, as illustrated in the example above. Joining with an anonymous stamp (ID = 0) will simply merge the event tree, a behavior that is used by the Receive extension method (below).
 
@@ -163,7 +163,7 @@ void SendMessage(byte[] data)
 
 Illustrating with ITC graphical notation:
 
-![send-example-diagram](https://github.com/fallin/Itc4net/blob/master/docs/img/send-example-diagram.png)
+![send-example-diagram](docs/img/send-example-diagram.png?raw=true)
 
 *Note: Stamps are immutable and the stamp is inflated as part of Send, so the method must return two stamps. The return value is the inflated stamp (with ID) and the out parameter is the the inflated anonymous stamp.*
 
@@ -172,12 +172,12 @@ Illustrating with ITC graphical notation:
 The Receive extension method performs an atomic join & event, which is commonly used to merge causal information from a received message with the receiver's causal information.
 
 ```c#
-Stamp _s; // Private member, e.g., ((0,(1,0)),(0,2,0))
+Stamp _s; // Private member, e.g., ((0,(1,0)),(0,0,(0,2,0)))
 
 void ReceiveMessage(MessageBody message)
 {
   	Stamp timestamp = message.Headers["Timestamp"]; // (0,(1,(1,1,0),0))
-  	_s = _s.Receive(timestamp); // join + event = ((0,(1,0)),(1,(1,1,0),(0,1,0)))
+  	_s = _s.Receive(timestamp); // join + event = ((0,(1,0)),(1,(1,1,0),(0,2,0)))
   	
   	// ... process the message ...
 }
