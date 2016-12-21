@@ -183,6 +183,10 @@ void ReceiveMessage(MessageBody message)
 }
 ```
 
+Illustrating with ITC graphical notation:
+
+![receive-example-diagram](docs/img/receive-example-diagram.png?raw=true)
+
 #### Other Examples
 
 The Itc4net.Tests project includes [tests that demonstrate different scenarios](https://github.com/fallin/Itc4net/blob/master/src/Itc4net.Tests/ScenarioTests.cs) that may be useful as more complete examples, including:
