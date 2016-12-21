@@ -10,11 +10,11 @@ This project is a C#/.NET implementation of the ideas presented in the 2008 pape
 
 The term *causality* in distributed systems originates from the concept of causality in physics where "causal connections gives us the only ordering of events that all observers will agree on" ([The Speed of Light is NOT About Light](https://youtu.be/msVuCEs8Ydo?t=44s) | [PBS Digital Studios | Space Time](https://www.youtube.com/channel/UC7_gcs09iThXybpVgjHZ_7g)). In distributed systems, physical clocks are problematic because of drift, synchronization issues, leap seconds, and double-counting—just to name a few (see, [the trouble with timestamps](https://aphyr.com/posts/299-the-trouble-with-timestamps) more details). In short, there is no global clock. A causal history (or compressed representation) is necessary to determine the partial ordering of events or detect inconsistent data replicas because physical clocks are unreliable.
 
-It's worth mentioning, in this context, a causal relationship implies one thing could have practically influenced another, such as, event A happened before event B. It's a weaker assertion than in statistics which differentiates between causation and correlation.
+It's worth mentioning, in this context, a causal relationship implies one thing could have potentially influenced another, such as, change A was known before change occurred. It's a weaker assertion than in statistics which differentiates between causation and correlation.
 
 ### Getting Started
 
-To get started, the best way to become familiar with the basics of interval tree clocks is to read the [ITC paper](http://gsd.di.uminho.pt/members/cbm/ps/itc2008.pdf). The first 3 sections provide an overview and explain the fork-event-join model. Don't worry, it is <u>not</u> necessary to understand how the kernel operations are implemented.
+To get started, the best way to become familiar with the basics of interval tree clocks is to read the [ITC paper](http://gsd.di.uminho.pt/members/cbm/ps/itc2008.pdf). The first 3 sections provide an overview and explain the fork-event-join model. It is helpful, but not necessary to understand how the kernel operations are implemented.
 
 Install using the NuGet Package Manager:
 
@@ -30,7 +30,7 @@ An ITC stamp is composed of two parts: an ID and event tree (i.e., casual past).
 Stamp seed = new Stamp(); // (1,0)
 ```
 
-Itc4net uses immutable types for the core ITC Stamp, Id, and Event classes; therefore, the ITC kernel operations (fork, join, and event) are pure functions. As a consequence, it is important to treat the Stamp like a struct type and replace the Stamp variable reference with a new reference when performing any kernel operations. 
+Itc4net uses immutable types for the core ITC Stamp, Id, and Event classes; therefore, the ITC kernel operations (fork, join, and event) are pure functions. As a consequence, it is important to treat a Stamp like a struct type and replace the Stamp variable reference with a new reference when performing any kernel operations. 
 
 For example, do this:
 
@@ -60,7 +60,7 @@ s = forked.Item1; // replace variable s with one of the new stamps
 Stamp another = forked.Item2; // a logical clock for use by another process
 ```
 
-Since extracting multiple multiple items from tuples is awkward, there are extension methods that provide an alternative API with out parameters, if preferred:
+Since extracting multiple items from tuples is awkward, there are extension methods that provide an alternative API with out parameters, if preferred:
 
 ```c#
 Stamp s = new Stamp();
@@ -87,7 +87,7 @@ Stamp s1, s2, s3, s4;
 s.Fork(out s1, out s2, out s3, out s4);
 ```
 
-*A note about logical clock identifiers: the ID of a logical clock needs to be unique in the system. Some approaches use integers which works well when there is a global authority that can hand-out identities or when the system uses a fixed number of participants. Some approaches use UUIDs (or other globally unique naming strategy) which allows any number of participants, but tracking casual histories for each participant leads to very large timestamps. Instead, ITC uses the fork operation to generate a distinct pair of IDs from an existing stamp. This allows a dynamic number of participants and eliminates the need for a global authority, as any (non-anonymous) stamp can generate new IDs.*
+*A note about logical clock identifiers: the ID of a logical clock needs to be unique in the system, for each participant. Some approaches use integers which works well when there is a global authority that can hand-out identities or when the system uses a fixed number of participants. Some approaches use UUIDs (or other globally unique naming strategy) which allows any number of participants, but tracking casual history for each participant leads to very large timestamps. Instead, ITC uses the fork operation to generate a distinct pair of IDs from an existing stamp. This allows a dynamic number of participants and eliminates the need for a global authority, as any (non-anonymous) stamp can generate new IDs.*
 
 #### Peek
 
@@ -98,13 +98,13 @@ Stamp _s; // Private member, e.g., (((1,0),0),(1,1,0))
 
 Stamp GetTimestamp()
 {
-	_s = _s.Event();	// Inflate stamp
+	_s = _s.Event();	// Inflate stamp (((1,0),0),(1,(1,1,0),0))
   	return _s.Peek();	// return anonymous stamp
 }
 
 void SendMessage(byte[] data)
 {
-  	Stamp timestamp = GetTimestamp(); // e.g., (0,(1,1,0)) <-- the ID is always 0
+  	Stamp timestamp = GetTimestamp(); // e.g., (0,(1,(1,1,0),0)) <-- the ID is always 0
   	
   	MessageBody message = new MessageBody(data);
 	message.Headers["Timestamp"] = timestamp.ToString();
@@ -121,7 +121,7 @@ Stamp s = new Stamp();	// (1,0)
 s = s.Event();			// (1,1)
 ```
 
-*Note: An ID is necessary to inflate the stamp, since the inflation occurs within the area of the event tree that belongs to the ID. That is, the Event method ticks it's own clock and leaves causal information for other IDs unchanged. Invoking the Event method on an anonymous stamp will succeed, but will return an unchanged anonymous stamp since it cannot inflate the event tree.*
+*Note: An ID is necessary to inflate a stamp, since the inflation occurs within the area of the event tree that belongs to the ID. That is, the Event method ticks it's own clock and leaves causal information for other IDs unchanged. Invoking the Event method on an anonymous stamp will succeed, but will return an unchanged anonymous stamp since it cannot inflate the event tree.*
 
 #### Join
 
@@ -135,7 +135,7 @@ s1 = s1.Join(s2); // ((1,0),(0,2,0))
 s1.ToString().Dump();
 ```
 
-Using the ITC graphical notation, it looks like this:
+Illustrating with ITC graphical notation:
 
 ![join-example-diagram](docs\img\join-example-diagram.png)
 
@@ -153,13 +153,17 @@ Stamp _s; // Private member, e.g., (((1,0),0),(1,1,0))
 void SendMessage(byte[] data)
 {
   	Stamp timestamp;
-  	_s = _s.Send(out timestamp); // (0,(1,1,0))
+  	_s = _s.Send(out timestamp); // (0,(1,(1,1,0),0))
   	
   	MessageBody message = new MessageBody(data);
 	message.Headers["Timestamp"] = timestamp.ToString();
 	_bus.Send(message);
 }
 ```
+
+Illustrating with ITC graphical notation:
+
+![send-example-diagram](docs\img\send-example-diagram.png)
 
 *Note: Stamps are immutable and the stamp is inflated as part of Send, so the method must return two stamps. The return value is the inflated stamp (with ID) and the out parameter is the the inflated anonymous stamp.*
 
@@ -168,12 +172,12 @@ void SendMessage(byte[] data)
 The Receive extension method performs an atomic join & event, which is commonly used to merge causal information from a received message with the receiver's causal information.
 
 ```c#
-Stamp _s; // Private member, e.g., (((1,0),0),(1,1,0))
+Stamp _s; // Private member, e.g., ((0,(1,0)),(0,2,0))
 
 void ReceiveMessage(MessageBody message)
 {
-  	Stamp timestamp = message.Headers["Timestamp"];
-  	_s = _s.Receive(timestamp); // assimilate this causal past (resistance is futile)
+  	Stamp timestamp = message.Headers["Timestamp"]; // (0,(1,(1,1,0),0))
+  	_s = _s.Receive(timestamp); // join + event = ((0,(1,0)),(1,(1,1,0),(0,1,0)))
   	
   	// ... process the message ...
 }
@@ -189,7 +193,7 @@ The Itc4net.Tests project includes [tests that demonstrate different scenarios](
 
 ### Some Things to Consider
 
-Interval Tree Clocks are a fascinating approach to causality tracking, but ultimately the partial ordering of events (vector clocks) or the detection of inconsistent data replicas (version vectors) are combined with many other techniques within a distributed system. For example, [Amazon's Dynamo](http://s3.amazonaws.com/AllThingsDistributed/sosp/amazon-dynamo-sosp2007.pdf) paper combines many techniques, including: [consistent hashing](https://github.com/fallin/Wildling/blob/master/Wildling.Core/PartitionedConsistentHash.cs), versioning, membership, gossip protocols, failure detection, and more, to form a cohesive system. Yet, this is just one example. With causality tracking, like everything in computer science, there is no "one-size-fits-all" answers, so here are some things to consider:
+Interval Tree Clocks are a fascinating approach to causality tracking, but ultimately the partial ordering of events (vector clocks) or the detection of inconsistent data replicas (version vectors) are combined with many other techniques within a distributed system. For example, [Amazon's Dynamo](http://s3.amazonaws.com/AllThingsDistributed/sosp/amazon-dynamo-sosp2007.pdf) paper combines many techniques, including: [consistent hashing](https://github.com/fallin/Wildling/blob/master/Wildling.Core/PartitionedConsistentHash.cs), versioning, membership, gossip protocols, failure detection, and more, to form a cohesive system. With causality tracking, like everything in computer science, there are no one-size-fits-all answers, so here are some things to consider:
 
 Obtaining or distributing stamps among multiple participants requires careful consideration:
 
@@ -202,8 +206,8 @@ Obtaining or distributing stamps among multiple participants requires careful co
 
 Threading & Synchronization Concerns
 
-- The core ITC classes (stamp, ID, and event) are immutable so they are inherently thread-safe. However, that transfers synchronization concerns to the developer using the library. For example, imagine a process (e.g., ASP.NET WebAPI application) that maintains a single ITC stamp to track causal history for the entire process. While the core operations themselves are thread-safe, an operations on the stamp need to be synchronized (serialized access) since the variable needs to be overwritten. That is, concurrent calls to Event is not the same as serialized calls to Event.
-  - [Future enhancement?] It may be useful to provide a mutable wrapper class that performs synchronized access to the ITC stamp. The wrapper class's API would be simpler because mutable versions of Event, Join, and Receive would not have to return a value and Send could simply return the anonymous stamp (not both).
+- The core ITC classes (stamp, ID, and event) are immutable so they are inherently thread-safe. However, that transfers synchronization concerns to the developer using the library. For example, imagine a process (e.g., ASP.NET WebAPI application) that maintains a single ITC stamp to track causal history for the entire process. While the core operations themselves are thread-safe, any operations on the  shared variable instance need to be synchronized (serialized access) since the variable needs to be overwritten between each operation. That is, concurrent calls to Event are not the same as serialized calls to Event.
+  - [Future Enhancement?] It may be useful to provide a mutable wrapper class that performs synchronized operations on a shared ITC stamp. The wrapper class's API would be simpler because mutable versions of Event, Join, and Receive would not have to return a value and Send could simply return the anonymous stamp. It's unclear whether this would help or make the API surface more confusing (i.e., this is immutable, but this other class is not!)
 
 ### Additional Resources
 
