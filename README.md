@@ -137,7 +137,7 @@ s1.ToString().Dump();
 
 Illustrating with ITC graphical notation:
 
-![join-example-diagram](docs\img\join-example-diagram.png)
+![join-example-diagram](https://github.com/fallin/Itc4net/blob/master/docs/img/join-example-diagram.png)
 
 Joining stamps with IDs is useful when a participant leaves the system (and no longer needed) because it essentially recovers the ID and has the potential to reduce the size of the stamp, as illustrated in the example above. Joining with an anonymous stamp (ID = 0) will simply merge the event tree, a behavior that is used by the Receive extension method (below).
 
@@ -163,7 +163,7 @@ void SendMessage(byte[] data)
 
 Illustrating with ITC graphical notation:
 
-![send-example-diagram](docs\img\send-example-diagram.png)
+![send-example-diagram](https://github.com/fallin/Itc4net/blob/master/docs/img/send-example-diagram.png)
 
 *Note: Stamps are immutable and the stamp is inflated as part of Send, so the method must return two stamps. The return value is the inflated stamp (with ID) and the out parameter is the the inflated anonymous stamp.*
 
