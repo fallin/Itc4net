@@ -87,7 +87,7 @@ Stamp s1, s2, s3, s4;
 s.Fork(out s1, out s2, out s3, out s4);
 ```
 
-*A note about logical clock identifiers: the ID of a logical clock needs to be unique in the system, for each participant. Some approaches use integers which works well when there is a global authority that can hand-out identities or when the system uses a fixed number of participants. Some approaches use UUIDs (or other globally unique naming strategy) which allows any number of participants, but tracking casual history for each participant leads to very large timestamps. Instead, ITC uses the fork operation to generate a distinct pair of IDs from an existing stamp. This allows a dynamic number of participants and eliminates the need for a global authority, as any (non-anonymous) stamp can generate new IDs.*
+*A note about logical clock identifiers: the ID of a logical clock needs to be unique in the system, for each participant. Some approaches use integers which works well when there is a global authority that can hand out identities or when a system uses a fixed number of participants. Some approaches use UUIDs (or other globally unique naming strategies) which allows any number of participants, but tracking casual history for each participant leads to very large timestamps. Instead, ITC uses the fork operation to generate a distinct pair of IDs from an existing stamp. This allows a dynamic number of participants and eliminates the need for a global authority, as any (non-anonymous) stamp can generate new IDs.*
 
 #### Peek
 
@@ -121,7 +121,7 @@ Stamp s = new Stamp();	// (1,0)
 s = s.Event();			// (1,1)
 ```
 
-*Note: An ID is necessary to inflate a stamp, since the inflation occurs within the area of the event tree that belongs to the ID. That is, the Event method ticks it's own clock and leaves causal information for other IDs unchanged. Invoking the Event method on an anonymous stamp will succeed, but will return an unchanged anonymous stamp since it cannot inflate the event tree.*
+*Note: An ID is necessary to inflate a stamp, since the inflation occurs within the area of the event tree that belongs to the ID. That is, the Event method ticks its own clock and leaves causal information for other IDs unchanged. Invoking the Event method on an anonymous stamp will succeed; however, it will return an unchanged anonymous stamp since it cannot inflate the event tree.*
 
 #### Join
 
@@ -139,7 +139,7 @@ Illustrating with ITC graphical notation:
 
 ![join-example-diagram](docs/img/join-example-diagram.png?raw=true)
 
-Joining stamps with IDs is useful when a participant leaves the system (and no longer needed) because it essentially recovers the ID and has the potential to reduce the size of the stamp, as illustrated in the example above. Joining with an anonymous stamp (ID = 0) will simply merge the event tree, a behavior that is used by the Receive extension method (below).
+Joining stamps with IDs is useful when a participant leaves the system (and no longer needed) because it essentially retires the ID and has the potential to reduce the size of the stamp, as illustrated in the example above. Joining with an anonymous stamp (ID = 0) will simply merge the event tree, a behavior that is used by the Receive extension method (below).
 
 #### Send
 
