@@ -10,7 +10,7 @@ namespace Itc4net
     /// <summary>
     /// An ITC stamp (logical clock)
     /// </summary>
-    public class Stamp : IEquatable<Stamp>
+    public class Stamp : IEquatable<Stamp>, IComparable<Stamp>
     {
         readonly Id _i;
         readonly Event _e;
@@ -306,6 +306,61 @@ namespace Itc4net
             {
                 return decoder.Decode(bytes);
             }
+        }
+
+        /// <summary>
+        /// Compares the current Stamp with another Stamp for a partial order.
+        /// </summary>
+        /// <param name="other">An object to compare with this instance.</param>
+        /// <returns>
+        /// A value that indicates the partial order of the objects being compared.
+        /// The return value has the following meanings:
+        ///
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Value</term>
+        ///         <term>Meaning</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Less than zero</term>
+        ///         <term>This stamp happens before <paramref name="other" />.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Zero</term>
+        ///         <term>This stamp either equals or is concurrent with <paramref name="other" /></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Greater than zero</term>
+        ///         <term>The <paramref name="other" /> stamp happens before this stamp.</term>
+        ///     </item>
+        /// </list>
+        /// </returns>
+        /// <exception cref="System.ArgumentNullException">other</exception>
+        /// <remarks>
+        /// ITC stamps only provide a partial order. CompareTo returns zero when the compared
+        /// stamps are equal or concurrent. When used with Sort methods, the stamps will be
+        /// partially ordered.
+        /// </remarks>
+        public int CompareTo(Stamp other)
+        {
+            if (other == null) throw new ArgumentNullException(nameof(other));
+
+            if (Equals(other))
+            {
+                return 0;
+            }
+
+            if (Leq(other))
+            {
+                return -1;
+            }
+
+            if (other.Leq(this))
+            {
+                return 1;
+            }
+
+            return 0;
         }
     }
 }

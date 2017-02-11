@@ -585,5 +585,55 @@ namespace Itc4net.Tests
             // Assert
             decoded.Should().Be(original);
         }
+
+        [Test]
+        public void CompareToShouldReturnZeroWhenComparingSeedStamps()
+        {
+            Stamp s1 = new Stamp();
+            Stamp s2 = new Stamp();
+
+            s1.CompareTo(s2).Should().Be(0);
+        }
+
+        [Test]
+        public void CompareToShouldReturnNegativeValueWhenLeftHappensBeforeRight()
+        {
+            Stamp s1 = new Stamp();
+            Stamp s2 = s1.Event();
+
+            s1.CompareTo(s2).Should().BeLessThan(0);
+        }
+
+        [Test]
+        public void CompareToShouldReturnPositiveValueWhenRightHappensBeforeLeft()
+        {
+            Stamp s1 = new Stamp();
+            Stamp s2 = s1.Event();
+
+            s2.CompareTo(s1).Should().BeGreaterThan(0);
+        }
+
+        [Test]
+        public void CompareShouldReturnZeroWhenStampsCausallyConcurrent()
+        {
+            Stamp s1;
+            Stamp s2;
+            new Stamp().Fork(out s1, out s2);
+
+            s1 = s1.Event();
+            s2 = s2.Event();
+
+            s1.Concurrent(s2).Should().BeTrue();
+            s1.CompareTo(s2).Should().Be(0);
+        }
+
+        [Test]
+        [SuppressMessage("ReSharper", "ReturnValueOfPureMethodIsNotUsed")]
+        public void CompareShouldThrowWhenArgumentIsNull()
+        {
+            Action act = () => { new Stamp().CompareTo(null); };
+
+            act.ShouldThrow<ArgumentNullException>();
+        }
     }
 }
