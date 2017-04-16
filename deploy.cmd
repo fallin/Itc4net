@@ -2,7 +2,8 @@
 @cd /d "%~dp0"
 
 echo info: Setup MSBuild environment
-call "%VS140COMNTOOLS%VsMSBuildCmd.bat"
+set VS150COMNTOOLS=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools
+call "%VS150COMNTOOLS%\VsMSBuildCmd.bat"
 
 echo info: Build Itc4net
 msbuild.exe ".\src\Itc4net.sln" /p:Configuration=Release /t:Rebuild
