@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
     <metadata>
         <id>Itc4net</id>
-        <version>1.0.0-beta2</version>
+        <version>1.0.0-beta3</version>
         <title>Itc4net: interval tree clocks for .NET</title>
         <authors>Brant Fallin</authors>
         <owners>Brant Fallin, fallin</owners>
@@ -16,5 +16,6 @@
     </metadata>
     <files>
         <file src="src\Itc4net\bin\Release\Itc4net.dll" target="lib\net452\Itc4net.dll" />
+        <file src="src\Itc4net\bin\Release\Itc4net.xml" target="lib\net452\Itc4net.xml" />
     </files>
 </package>

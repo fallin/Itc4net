@@ -43,9 +43,9 @@ namespace Itc4net
             return _e.Leq(other._e);
         }
 
-        /// <summary>
-        /// Happened-before relation
-        /// </summary>
+        //// <summary>
+        //// Happened-before relation
+        //// </summary>
         //public static bool Leq(Stamp s1, Stamp s2)
         //{
         //    return s1._e.Leq(s2._e);

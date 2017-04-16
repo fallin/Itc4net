@@ -26,7 +26,7 @@ namespace Itc4net
         /// </summary>
         /// <param name="source">The source.</param>
         /// <param name="other">The other.</param>
-        /// <returns><c>true</c> if a !--> b && b !--> a, <c>false</c> otherwise. (Where "!-->" is not happends-before)</returns>
+        /// <returns><c>true</c> if a !--> b &amp;&amp; b !--> a, <c>false</c> otherwise. (Where "!-->" is not happends-before)</returns>
         public static bool Concurrent(this Stamp source, Stamp other)
         {
             return !source.Leq(other) && !other.Leq(source);
