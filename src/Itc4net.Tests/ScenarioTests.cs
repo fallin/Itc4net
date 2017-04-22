@@ -19,7 +19,7 @@ namespace Itc4net.Tests
             Stamp seed = new Stamp();
             seed.Should().Be(new Stamp(1, 0));
 
-            Tuple<Stamp, Stamp> forkSeed = seed.Fork();
+            (Stamp, Stamp) forkSeed = seed.Fork();
             Stamp p1 = forkSeed.Item1;
             p1.Should().Be(new Stamp(new Id.Node(1, 0), 0));
 
@@ -29,7 +29,7 @@ namespace Itc4net.Tests
             p1 = p1.Event();
             p1.Should().Be(new Stamp(new Id.Node(1, 0), new Event.Node(0, 1, 0)));
 
-            Tuple<Stamp, Stamp> fork1 = p1.Fork();
+            (Stamp, Stamp) fork1 = p1.Fork();
             p1 = fork1.Item1;
             p1.Should().Be(new Stamp(new Id.Node(new Id.Node(1, 0), 0), new Event.Node(0, 1, 0)));
 
@@ -48,7 +48,7 @@ namespace Itc4net.Tests
             Stamp join23 = p2.Join(p3);
             join23.Should().Be(new Stamp(new Id.Node(new Id.Node(0, 1), 1), new Event.Node(1, 0, 1)));
 
-            Tuple<Stamp, Stamp> fork23 = join23.Fork();
+            (Stamp, Stamp) fork23 = join23.Fork();
             p2 = fork23.Item1;
             p2.Should().Be(new Stamp(new Id.Node(new Id.Node(0, 1), 0), new Event.Node(1, 0, 1)));
 
@@ -76,7 +76,7 @@ namespace Itc4net.Tests
 
             Stamp seed = new Stamp();
 
-            Tuple<Stamp, Stamp> fork = seed.Fork();
+            (Stamp, Stamp) fork = seed.Fork();
             Process p = new Process("p", fork.Item1);
             Process q = new Process("q", fork.Item2);
 

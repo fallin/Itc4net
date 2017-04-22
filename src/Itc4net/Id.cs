@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using Itc4net.Binary;
 
 namespace Itc4net
@@ -88,11 +87,8 @@ namespace Itc4net
 
             public Node(Id left, Id right)
             {
-                if (left == null) throw new ArgumentNullException(nameof(left));
-                if (right == null) throw new ArgumentNullException(nameof(right));
-
-                L = left;
-                R = right;
+                L = left ?? throw new ArgumentNullException(nameof(left));
+                R = right ?? throw new ArgumentNullException(nameof(right));
             }
 
             internal override T Match<T>(Func<int, T> leaf, Func<Id, Id, T> node)
@@ -187,20 +183,20 @@ namespace Itc4net
         internal void Match(Action<int> leaf, Action<Id, Id> node)
         {
             // Adapt leaf action to func (ret null)
-            Func<int, object> adaptLeaf = value =>
+            object AdaptLeaf(int value)
             {
                 leaf?.Invoke(value);
                 return null;
-            };
+            }
 
             // Adapt node action to func (ret null)
-            Func<Id, Id, object> adaptNode = (il, ir) =>
+            object AdaptNode(Id il, Id ir)
             {
                 node?.Invoke(il, ir);
                 return null;
-            };
+            }
 
-            Match(adaptLeaf, adaptNode);
+            Match(AdaptLeaf, AdaptNode);
         }
 
         internal static Id Sum(Id i1, Id i2)

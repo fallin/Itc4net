@@ -102,12 +102,10 @@ namespace Itc4net
             public Node(int n, Event left, Event right)
             {
                 if (n < 0) throw new ArgumentOutOfRangeException(nameof(n), n, "Must be >= 0");
-                if (left == null) throw new ArgumentNullException(nameof(left));
-                if (right == null) throw new ArgumentNullException(nameof(right));
 
                 N = n;
-                L = left;
-                R = right;
+                L = left ?? throw new ArgumentNullException(nameof(left));
+                R = right ?? throw new ArgumentNullException(nameof(right));
             }
 
             public override string ToString()
@@ -262,18 +260,19 @@ namespace Itc4net
 
         internal void Match(Action<int> leaf, Action<int, Event, Event> node)
         {
-            Func<int, object> leafFunc = n =>
+            object LeafFunc(int n)
             {
                 leaf?.Invoke(n);
                 return null;
-            };
-            Func<int, Event, Event, object> nodeFunc = (n, l, r) =>
+            }
+
+            object NodeFunc(int n, Event l, Event r)
             {
                 node?.Invoke(n, l, r);
                 return null;
-            };
+            }
 
-            Match(leafFunc, nodeFunc);
+            Match(LeafFunc, NodeFunc);
         }
 
         internal static bool Leq(Event e1, Event e2)

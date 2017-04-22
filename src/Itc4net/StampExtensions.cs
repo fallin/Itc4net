@@ -11,12 +11,19 @@ namespace Itc4net
             return inflated;
         }
 
+        public static (Stamp inflated, Stamp anonymous) Send(this Stamp source)
+        {
+            Stamp inflated = source.Event();
+            Stamp anonymous = inflated.Peek();
+            return (inflated, anonymous);
+        }
+
         public static Stamp Receive(this Stamp source, Stamp other)
         {
             return source.Join(other).Event();
         }
 
-        public static Tuple<Stamp, Stamp> Sync(this Stamp source, Stamp other)
+        public static (Stamp, Stamp) Sync(this Stamp source, Stamp other)
         {
             return source.Join(other).Fork();
         }
@@ -40,17 +47,17 @@ namespace Itc4net
         /// <remarks>
         /// A convenience method for forking 1 stamp into 3 unique stamps.
         /// </remarks>
-        public static Tuple<Stamp, Stamp, Stamp> Fork3(this Stamp source)
+        public static (Stamp, Stamp, Stamp) Fork3(this Stamp source)
         {
-            Tuple<Stamp, Stamp> fork = source.Fork();
+            (Stamp, Stamp) fork = source.Fork();
             Stamp a = fork.Item1;
             Stamp c = fork.Item2;
 
-            Tuple<Stamp, Stamp> fork1 = a.Fork();
+            (Stamp, Stamp) fork1 = a.Fork();
             a = fork1.Item1;
             Stamp b = fork1.Item2;
 
-            return Tuple.Create(a, b, c);
+            return (a, b, c);
         }
 
         /// <summary>
@@ -61,21 +68,21 @@ namespace Itc4net
         /// <remarks>
         /// A convenience method for forking 1 stamp into 4 unique stamps.
         /// </remarks>
-        public static Tuple<Stamp, Stamp, Stamp, Stamp> Fork4(this Stamp source)
+        public static (Stamp, Stamp, Stamp, Stamp) Fork4(this Stamp source)
         {
-            Tuple<Stamp, Stamp> fork = source.Fork();
+            (Stamp, Stamp) fork = source.Fork();
             Stamp a = fork.Item1;
             Stamp c = fork.Item2;
 
-            Tuple<Stamp, Stamp> fork1 = a.Fork();
+            (Stamp, Stamp) fork1 = a.Fork();
             a = fork1.Item1;
             Stamp b = fork1.Item2;
 
-            Tuple<Stamp, Stamp> fork2 = c.Fork();
+            (Stamp, Stamp) fork2 = c.Fork();
             c = fork2.Item1;
             Stamp d = fork2.Item2;
 
-            return Tuple.Create(a, b, c, d);
+            return (a, b, c, d);
         }
 
         /// <summary>

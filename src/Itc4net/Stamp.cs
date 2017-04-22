@@ -26,11 +26,8 @@ namespace Itc4net
 
         public Stamp(Id i, Event e)
         {
-            if (i == null) throw new ArgumentNullException(nameof(i));
-            if (e == null) throw new ArgumentNullException(nameof(e));
-
-            _i = i;
-            _e = e;
+            _i = i ?? throw new ArgumentNullException(nameof(i));
+            _e = e ?? throw new ArgumentNullException(nameof(e));
         }
 
         public bool IsAnonymous => _i == 0;
@@ -58,10 +55,10 @@ namespace Itc4net
         /// A 2-tuple, each with a unique identity and a copy of the causal history.
         /// </returns>
         [Pure]
-        public Tuple<Stamp, Stamp> Fork()
+        public (Stamp, Stamp) Fork()
         {
             var i = _i.Split();
-            return Tuple.Create(
+            return (
                 new Stamp(i.L, _e),
                 new Stamp(i.R, _e)
             );
@@ -149,21 +146,19 @@ namespace Itc4net
             return !Equals(left, right);
         }
 
-        internal Tuple<Event, int> Grow()
+        internal (Event, int cost) Grow()
         {
-            Tuple<Event, int> error = Tuple.Create((Event)null, -1);
+            (Event, int) error = ((Event)null, -1);
 
-            var result = _e.Match(n =>
+            (Event, int) result = _e.Match(n =>
                 {
                     if (_i == 1)
                     {
-                        return Tuple.Create((Event)(n + 1), 0);
+                        return (n + 1, 0);
                     }
 
-                    var g = new Stamp(_i, new Event.Node(n, 0, 0)).Grow();
-                    Event eʹ = g.Item1;
-                    int c = g.Item2;
-                    return Tuple.Create(eʹ, c + 1000);
+                    (Event eʹ, int c) = new Stamp(_i, new Event.Node(n, 0, 0)).Grow();
+                    return (eʹ, c + 1000);
                 },
                 (n, el, er) =>
                 {
@@ -173,36 +168,27 @@ namespace Itc4net
                         {
                             if (il == 0)
                             {
-                                var g = new Stamp(ir, er).Grow();
-                                var eʹr = g.Item1;
-                                var cr = g.Item2;
-                                return Tuple.Create((Event)new Event.Node(n, el, eʹr), cr + 1);
+                                (Event eʹr, int cr) = new Stamp(ir, er).Grow();
+                                return (new Event.Node(n, el, eʹr), cr + 1);
                             }
 
                             if (ir == 0)
                             {
-                                var g = new Stamp(il, el).Grow();
-                                var eʹl = g.Item1;
-                                var cl = g.Item2;
-                                return Tuple.Create((Event)new Event.Node(n, eʹl, er), cl + 1);
+                                (Event eʹl, int cl) = new Stamp(il, el).Grow();
+                                return (new Event.Node(n, eʹl, er), cl + 1);
                             }
 
                             {
-                                var gl = new Stamp(il, el).Grow();
-                                var eʹl = gl.Item1;
-                                var cl = gl.Item2;
-
-                                var gr = new Stamp(ir, er).Grow();
-                                var eʹr = gr.Item1;
-                                var cr = gr.Item2;
+                                (Event eʹl, int cl) = new Stamp(il, el).Grow();
+                                (Event eʹr, int cr) = new Stamp(ir, er).Grow();
 
                                 if (cl < cr)
                                 {
-                                    return Tuple.Create((Event)new Event.Node(n, eʹl, er), cl + 1);
+                                    return (new Event.Node(n, eʹl, er), cl + 1);
                                 }
                                 else // cl >= cr
                                 {
-                                    return Tuple.Create((Event)new Event.Node(n, el, eʹr), cr + 1);
+                                    return (new Event.Node(n, el, eʹr), cr + 1);
                                 }
                             }
                         });
