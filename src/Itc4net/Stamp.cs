@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Diagnostics.Contracts;
 using System.IO;
 using Itc4net.Binary;
@@ -57,7 +56,7 @@ namespace Itc4net
         [Pure]
         public (Stamp, Stamp) Fork()
         {
-            var i = _i.Split();
+            Id.Node i = _i.Split();
             return (
                 new Stamp(i.L, _e),
                 new Stamp(i.R, _e)
@@ -347,6 +346,11 @@ namespace Itc4net
             }
 
             return 0;
+        }
+
+        public static implicit operator Stamp((Id i, Event e) tuple)
+        {
+            return new Stamp(tuple.i, tuple.e);
         }
     }
 }

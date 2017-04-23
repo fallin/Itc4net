@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using Itc4net.Binary;
 
 namespace Itc4net
@@ -285,21 +284,6 @@ namespace Itc4net
             return e1.Join(e2);
         }
 
-        public static implicit operator Event(int n)
-        {
-            return new Leaf(n);
-        }
-
-        //public static implicit operator Event(Tuple<int> t)
-        //{
-        //    return new Leaf(t.Item1);
-        //}
-
-        //public static implicit operator Event(Tuple<int, Event, Event> t)
-        //{
-        //    return new Node(t.Item1, t.Item2, t.Item3);
-        //}
-
         public bool Equals(Event other)
         {
             if (other == null) return false;
@@ -336,6 +320,16 @@ namespace Itc4net
         public static bool operator !=(Event left, Event right)
         {
             return !Equals(left, right);
+        }
+
+        public static implicit operator Event(int n)
+        {
+            return new Leaf(n);
+        }
+
+        public static implicit operator Event((int n, Event left, Event right) tuple)
+        {
+            return new Node(tuple.n, tuple.left, tuple.right);
         }
     }
 }

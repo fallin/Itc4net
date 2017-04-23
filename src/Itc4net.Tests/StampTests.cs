@@ -2,9 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
 using Itc4net.Binary;
-using Itc4net.Text;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace Itc4net.Tests
 {
@@ -634,6 +632,19 @@ namespace Itc4net.Tests
             Action act = () => { new Stamp().CompareTo(null); };
 
             act.ShouldThrow<ArgumentNullException>();
+        }
+
+        [Test]
+        public void ImplicitConversionOperationShouldReturnStampWhenTuple()
+        {
+            // (((0,(1,0)),(1,0)),(1,2,(0,(1,0,2),0)))
+            Stamp s1 = new Stamp(
+                Id.Create(Id.Create(0, Id.Create(1, 0)), Id.Create(1, 0)),
+                Event.Create(1, 2, Event.Create(0, Event.Create(1, 0, 2), 0)));
+            Stamp s2 = (((0,(1,0)),(1,0)),(1,2,(0,(1,0,2),0)));
+            //         |<----- id ----->| |<----- event ---->|
+
+            s1.Equals(s2).Should().BeTrue();
         }
     }
 }

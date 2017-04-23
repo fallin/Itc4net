@@ -204,21 +204,6 @@ namespace Itc4net
             return i1.Sum(i2);
         }
 
-        public static implicit operator Id(int i)
-        {
-            return new Leaf(i);
-        }
-
-        //public static implicit operator Id(Tuple<int> t)
-        //{
-        //    return new Leaf(t.Item1);
-        //}
-
-        //public static implicit operator Id(Tuple<Id, Id> t)
-        //{
-        //    return new Node(t.Item1, t.Item2);
-        //}
-
         public bool Equals(Id other)
         {
             if (other == null) return false;
@@ -256,6 +241,16 @@ namespace Itc4net
         public static bool operator !=(Id left, Id right)
         {
             return !Equals(left, right);
+        }
+
+        public static implicit operator Id(int i)
+        {
+            return new Leaf(i);
+        }
+
+        public static implicit operator Id((Id left, Id right) tuple)
+        {
+            return new Node(tuple.left, tuple.right);
         }
     }
 }

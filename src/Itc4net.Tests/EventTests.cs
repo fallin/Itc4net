@@ -701,5 +701,23 @@ namespace Itc4net.Tests
             // Assert
             result.Should().Be(new Event.Node(4, 0, 2));
         }
+
+        [Test]
+        public void ImplicitConversionOperatorShouldReturnLeafWhenInteger()
+        {
+            Event e1 = new Event.Leaf(4);
+            Event e2 = 4;
+
+            e1.Equals(e2).Should().BeTrue();
+        }
+
+        [Test]
+        public void ImplicitConversionOperatorShouldReturnNodeWhenTuple()
+        {
+            Event e1 = new Event.Node(0, new Event.Node(1, 1, 0), 0);
+            Event e2 = (0, (1, 1, 0), 0); // combo of C#7 tuples and implicit conversion operator is wow!
+
+            e1.Equals(e2).Should().BeTrue();
+        }
     }
 }

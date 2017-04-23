@@ -496,5 +496,25 @@ namespace Itc4net.Tests
             // Assert
             sum.Should().Be(new Id.Node(1, 0));
         }
+
+        [Test]
+        public void ImplicitConversionOperatorShouldReturnLeafWhenInteger()
+        {
+            Id i1 = new Id.Leaf(1);
+            Id i2 = 1;
+
+            i1.Equals(i2).Should().BeTrue();
+        }
+
+        [Test]
+        public void ImplicitConversionOperatorShouldReturnNodeWhenTuple()
+        {
+            // Arrange
+            Id i1 = new Id.Node(new Id.Node(0, new Id.Node(1, 0)), new Id.Node(1, 0)); // ((0,(1,0)),(1,0))
+            Id i2 = ((0,(1,0)),(1,0)); // combo of C#7 tuples and implicit conversion operator is wow!
+
+            // Act & Assert
+            i1.Equals(i2).Should().BeTrue();
+        }
     }
 }
