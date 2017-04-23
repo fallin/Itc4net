@@ -10,7 +10,7 @@ This project is a C#/.NET implementation of the ideas presented in the 2008 pape
 
 The term *causality* in distributed systems originates from a concept in physics where "causal connections gives us the only ordering of events that all observers will agree on" ([The Speed of Light is NOT About Light](https://youtu.be/msVuCEs8Ydo?t=44s) | [PBS Digital Studios | Space Time](https://www.youtube.com/channel/UC7_gcs09iThXybpVgjHZ_7g)). In distributed systems, physical clocks are problematic because of drift, synchronization issues, leap seconds, and double-counting—just to name a few (see, [the trouble with timestamps](https://aphyr.com/posts/299-the-trouble-with-timestamps) for more details). In short, there is no global clock. A causal history (or compressed representation) is necessary to determine the partial ordering of events or detect inconsistent data replicas because physical clocks are unreliable.
 
-It's worth mentioning, in this context, a causal relationship implies one thing could have potentially influenced another, such as, change A was known before change B occurred. It's a weaker assertion than in statistics which differentiates between causation and correlation.
+It's worth mentioning, in this context, a causal relationship implies one thing could have potentially influenced another, such as, change A was known before change B occurred.
 
 ### Getting Started
 
@@ -81,10 +81,17 @@ Stamp s4 = forked.Item4;    // ((0,(0,1)),0)
 
 or, alternatively & more compactly, using out parameters:
 
-```
+```c#
 Stamp s = new Stamp();
 Stamp s1, s2, s3, s4;
 s.Fork(out s1, out s2, out s3, out s4);
+```
+
+**[New]** Using C#7 tuple deconstruction allows an even more convenient syntax:
+
+```c#
+Stamp s = new Stamp();		// (1,0)
+(Stamp s1, Stamp s2, Stamp s3, Stamp s4) = s.Fork4();
 ```
 
 *A note about logical clock identifiers: the ID of a logical clock needs to be unique in the system, one for each participant. Some approaches use integers which works well when there is a global authority that can hand out identities or when a system uses a fixed number of participants. Some approaches use UUIDs (or other globally unique naming strategies) which allows any number of participants, but tracking casual history for each participant leads to very large timestamps. Instead, ITC uses the fork operation to generate a distinct pair of IDs from an existing stamp. This allows a dynamic number of participants and eliminates the need for a global authority, as any (non-anonymous) stamp can generate new IDs.*

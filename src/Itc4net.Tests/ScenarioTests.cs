@@ -13,50 +13,134 @@ namespace Itc4net.Tests
     [TestFixture]
     public class ScenarioTests
     {
-        [Test(Description = "Example from ITC 2008 paper, section 5.1")]
+        // Example from ITC 2008 paper, section 5.1
+        //
+        //                                    e
+        //                             a3-----------a4----------+
+        //                            /                          \                 
+        //                e          /                            \          e       
+        //            a1-----a2-----f                              j-----a5-----a6    
+        //           /               \                            /
+        //          /                 \                          /
+        //         /                   c1---+              c3---+                  
+        //  seed--f                          \            /
+        //         \                          \          /
+        //          \                          j--------f
+        //           \                        /  (sync)  \
+        //            \                      /            \
+        //             b1-----b2-----b3-----+              b4                     
+        //                 e      e
+        //
+        [Test(Description = "Example from ITC 2008 paper, section 5.1 (C#6 syntax)")]
         public void Itc2008Example()
         {
+            // Start with seed stamp
             Stamp seed = new Stamp();
             seed.Should().Be(new Stamp(1, 0));
 
-            (Stamp, Stamp) forkSeed = seed.Fork();
-            Stamp p1 = forkSeed.Item1;
-            p1.Should().Be(new Stamp(new Id.Node(1, 0), 0));
+            // Fork seed stamp to create stamps for process A and B
+            (Stamp a1, Stamp b1) = seed.Fork();
+            a1.Should().Be(new Stamp(new Id.Node(1, 0), 0));
+            b1.Should().Be(new Stamp(new Id.Node(0, 1), 0));
 
-            Stamp p2 = forkSeed.Item2;
-            p2.Should().Be(new Stamp(new Id.Node(0, 1), 0));
+            // Process A suffers an event
+            Stamp a2 = a1.Event();
+            a2.Should().Be(new Stamp(new Id.Node(1, 0), new Event.Node(0, 1, 0)));
 
-            p1 = p1.Event();
-            p1.Should().Be(new Stamp(new Id.Node(1, 0), new Event.Node(0, 1, 0)));
+            // Process A forks to create stamp for new process C (dynamic number of participants)
+            (Stamp a3, Stamp c1) = a2.Fork();
+            a3.Should().Be(new Stamp(new Id.Node(new Id.Node(1, 0), 0), new Event.Node(0, 1, 0)));
+            c1.Should().Be(new Stamp(new Id.Node(new Id.Node(0, 1), 0), new Event.Node(0, 1, 0)));
 
-            (Stamp, Stamp) fork1 = p1.Fork();
-            p1 = fork1.Item1;
-            p1.Should().Be(new Stamp(new Id.Node(new Id.Node(1, 0), 0), new Event.Node(0, 1, 0)));
+            // Process A suffers an event
+            Stamp a4 = a3.Event();
+            a4.Should().Be(new Stamp(new Id.Node(new Id.Node(1, 0), 0), new Event.Node(0, new Event.Node(1, 1, 0), 0)));
 
-            Stamp p3 = fork1.Item2;
-            p3.Should().Be(new Stamp(new Id.Node(new Id.Node(0, 1), 0), new Event.Node(0, 1, 0)));
+            // Process B suffers an event
+            Stamp b2 = b1.Event();
+            b2.Should().Be(new Stamp(new Id.Node(0, 1), new Event.Node(0, 0, 1)));
 
-            p1 = p1.Event();
-            p1.Should().Be(new Stamp(new Id.Node(new Id.Node(1, 0), 0), new Event.Node(0, new Event.Node(1, 1, 0), 0)));
+            // Process B suffers an event
+            Stamp b3 = b2.Event();
+            b3.Should().Be(new Stamp(new Id.Node(0, 1), new Event.Node(0, 0, 2)));
 
-            p2 = p2.Event();
-            p2.Should().Be(new Stamp(new Id.Node(0, 1), new Event.Node(0, 0, 1)));
+            // Process B and C synchronize (join and fork)
+            (Stamp c3, Stamp b4) = b3.Sync(c1);
+            c3.Should().Be(new Stamp(new Id.Node(new Id.Node(0, 1), 0), new Event.Node(1, 0, 1)));
+            b4.Should().Be(new Stamp(new Id.Node(0, 1), new Event.Node(1, 0, 1)));
 
-            p2 = p2.Event();
-            p2.Should().Be(new Stamp(new Id.Node(0, 1), new Event.Node(0, 0, 2)));
+            // Process C retires and joins with process A
+            Stamp a5 = a4.Join(c3);
+            a5.Should().Be(new Stamp(new Id.Node(1, 0), new Event.Node(1, new Event.Node(0, 1, 0), 1)));
 
-            Stamp join23 = p2.Join(p3);
-            join23.Should().Be(new Stamp(new Id.Node(new Id.Node(0, 1), 1), new Event.Node(1, 0, 1)));
+            // Process A suffers an event (inflates and simplifies to single integer event)
+            Stamp a6 = a5.Event();
+            a6.Should().Be(new Stamp(new Id.Node(1,0), 2));
+        }
 
-            (Stamp, Stamp) fork23 = join23.Fork();
-            p2 = fork23.Item1;
-            p2.Should().Be(new Stamp(new Id.Node(new Id.Node(0, 1), 0), new Event.Node(1, 0, 1)));
+        // Example from ITC 2008 paper, section 5.1
+        //
+        //                                    e
+        //                             a3-----------a4----------+
+        //                            /                          \                 
+        //                e          /                            \          e       
+        //            a1-----a2-----f                              j-----a5-----a6    
+        //           /               \                            /
+        //          /                 \                          /
+        //         /                   c1---+              c3---+                  
+        //  seed--f                          \            /
+        //         \                          \          /
+        //          \                          j--------f
+        //           \                        /  (sync)  \
+        //            \                      /            \
+        //             b1-----b2-----b3-----+              b4                     
+        //                 e      e
+        //
+        [Test(Description = "Example from ITC 2008 paper, section 5.1 (C#7 syntax)")]
+        public void Itc2008ExampleUsingCSharp7SyntaxAndImplicitConversionOperators()
+        {
+            // Start with seed stamp
+            Stamp seed = new Stamp();
+            seed.Should().Be((1, 0));
 
-            p3 = fork23.Item2;
-            p3.Should().Be(new Stamp(new Id.Node(0, 1), new Event.Node(1, 0, 1)));
+            // Fork seed stamp to create stamps for process A and B
+            (Stamp a1, Stamp b1) = seed.Fork();
+            a1.Should().Be(((1, 0), 0));
+            b1.Should().Be(((0, 1), 0));
 
-            p1 = p1.Receive(p2);
-            p1.Should().Be(new Stamp(new Id.Node(1,0), 2));
+            // Process A suffers an event
+            Stamp a2 = a1.Event();
+            a2.Should().Be(((1, 0), (0, 1, 0)));
+
+            // Process A forks to create stamp for new process C (dynamic number of participants)
+            (Stamp a3, Stamp c1) = a2.Fork();
+            a3.Should().Be((((1, 0), 0), (0, 1, 0)));
+            c1.Should().Be((((0, 1), 0), (0, 1, 0)));
+
+            // Process A suffers an event
+            Stamp a4 = a3.Event();
+            a4.Should().Be((((1, 0), 0), (0, (1, 1, 0), 0)));
+
+            // Process B suffers an event
+            Stamp b2 = b1.Event();
+            b2.Should().Be(((0, 1), (0, 0, 1)));
+
+            // Process B suffers an event
+            Stamp b3 = b2.Event();
+            b3.Should().Be(((0, 1), (0, 0, 2)));
+
+            // Process B and C synchronize (join and fork)
+            (Stamp c3, Stamp b4) = b3.Sync(c1);
+            c3.Should().Be((((0, 1), 0), (1, 0, 1)));
+            b4.Should().Be(((0, 1), (1, 0, 1)));
+
+            // Process C retires and joins with process A
+            Stamp a5 = a4.Join(c3);
+            a5.Should().Be(((1, 0), (1, (0, 1, 0), 1)));
+
+            // Process A suffers an event (inflates and simplifies to single integer event)
+            Stamp a6 = a5.Event();
+            a6.Should().Be(((1, 0), 2));
         }
 
         [Test]
