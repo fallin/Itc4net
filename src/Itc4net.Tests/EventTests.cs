@@ -15,7 +15,7 @@ namespace Itc4net.Tests
         }
 
         [Test]
-        public void ToShouldCorrectlyRepresentNode()
+        public void ToStringShouldCorrectlyRepresentNode()
         {
             string s = new Event.Node(0, 3, new Event.Node(1, 2, 3)).ToString();
             s.Should().Be("(0,3,(1,2,3))");
@@ -30,7 +30,7 @@ namespace Itc4net.Tests
         }
 
         [Test]
-        public void LeaftCtorShouldThrowWhenNegativeN()
+        public void LeafCtorShouldThrowWhenNegativeN()
         {
             Action act = () => new Event.Leaf(-1);
             act.ShouldThrow<ArgumentOutOfRangeException>();
