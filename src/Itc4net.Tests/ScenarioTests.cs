@@ -31,7 +31,7 @@ namespace Itc4net.Tests
         //             b1-----b2-----b3-----+              b4                     
         //                 e      e
         //
-        [Test(Description = "Example from ITC 2008 paper, section 5.1 (C#6 syntax)")]
+        [Test(Description = "Example from ITC 2008 paper, section 5.1")]
         public void Itc2008Example()
         {
             // Start with seed stamp
@@ -96,8 +96,8 @@ namespace Itc4net.Tests
         //             b1-----b2-----b3-----+              b4                     
         //                 e      e
         //
-        [Test(Description = "Example from ITC 2008 paper, section 5.1 (C#7 syntax)")]
-        public void Itc2008ExampleUsingCSharp7SyntaxAndImplicitConversionOperators()
+        [Test(Description = "Example from ITC 2008 paper, section 5.1 (with implicit conversion)")]
+        public void Itc2008ExampleWithImplicitConversionOperators()
         {
             // Start with seed stamp
             Stamp seed = new Stamp();

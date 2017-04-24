@@ -639,8 +639,13 @@ namespace Itc4net.Tests
         {
             // (((0,(1,0)),(1,0)),(1,2,(0,(1,0,2),0)))
             Stamp s1 = new Stamp(
-                Id.Create(Id.Create(0, Id.Create(1, 0)), Id.Create(1, 0)),
-                Event.Create(1, 2, Event.Create(0, Event.Create(1, 0, 2), 0)));
+                new Id.Node(
+                    new Id.Node(0, new Id.Node(1, 0)), 
+                    new Id.Node(1, 0)
+                    ), 
+                new Event.Node(
+                    1, 2, new Event.Node(0, new Event.Node(1, 0, 2), 0))
+                    );
             Stamp s2 = (((0,(1,0)),(1,0)),(1,2,(0,(1,0,2),0)));
             //         |<----- id ----->| |<----- event ---->|
 
