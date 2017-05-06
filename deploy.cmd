@@ -1,9 +1,24 @@
 @echo off
 @cd /d "%~dp0"
 
+echo info: Package and release Itc4net NuGet package
+
+echo info: Download vswhere (to locate msbuild)
+mkdir .\build
+set VSWHERE_URL=https://github.com/Microsoft/vswhere/releases/download/1.0.62/vswhere.exe
+@powershell -NoProfile -ExecutionPolicy Bypass -Command "Invoke-WebRequest -Uri %VSWHERE_URL% -OutFile '.\build\vswhere.exe'"
+if ERRORLEVEL 1 (
+    echo error: Failed to download vswhere
+    goto EXIT
+)
+
+:: See https://github.com/Microsoft/vswhere
+for /f "usebackq tokens=1* delims=: " %%i in (`.\build\vswhere -latest -requires Microsoft.Component.MSBuild`) do (
+  if /i "%%i"=="installationPath" set VSCOMNTOOLS=%%j
+)
+
 echo info: Setup MSBuild environment
-set VS150COMNTOOLS=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools
-call "%VS150COMNTOOLS%\VsMSBuildCmd.bat"
+call "%VSCOMNTOOLS%\Common7\tools\VsMSBuildCmd.bat"
 
 echo info: Build Itc4net
 msbuild.exe ".\src\Itc4net.sln" /p:Configuration=Release /t:Rebuild
