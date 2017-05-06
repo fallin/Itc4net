@@ -6,7 +6,7 @@ Itc4net is a C# implementation of Interval Tree Clocks (ITC), a causality tracki
 
 ### Overview
 
-This project is a C#/.NET implementation of the ideas presented in the 2008 paper, [Interval Tree Clocks: A Logical Clock for Dynamic Systems](http://gsd.di.uminho.pt/members/cbm/ps/itc2008.pdf). An Interval Tree Clock (ITC) provides a means of causality tracking in a distributed system with a dynamic number of participants and offers a way to determine the partial ordering of events.
+This project is a C#/.NET implementation of the ideas presented in the 2008 paper, [Interval Tree Clocks: A Logical Clock for Dynamic Systems](http://haslab.uminho.pt/cbm/files/itc.pdf). An Interval Tree Clock (ITC) provides a means of causality tracking in a distributed system with a dynamic number of participants and offers a way to determine the partial ordering of events.
 
 The term *causality* in distributed systems originates from a concept in physics where "causal connections gives us the only ordering of events that all observers will agree on" ([The Speed of Light is NOT About Light](https://youtu.be/msVuCEs8Ydo?t=44s) | [PBS Digital Studios | Space Time](https://www.youtube.com/channel/UC7_gcs09iThXybpVgjHZ_7g)). In distributed systems, physical clocks are problematic because of drift, synchronization issues, leap seconds, and double-counting—just to name a few (see, [the trouble with timestamps](https://aphyr.com/posts/299-the-trouble-with-timestamps) for more details). In short, there is no global clock. A causal history (or compressed representation) is necessary to determine the partial ordering of events or detect inconsistent data replicas because physical clocks are unreliable.
 
