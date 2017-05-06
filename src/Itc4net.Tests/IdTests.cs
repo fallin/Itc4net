@@ -412,7 +412,7 @@ namespace Itc4net.Tests
                 )
             );
 
-            // split(((1,0),0)) = ((((1,0),1),0),(((0,1),0),0))
+            // split(((1,0),0)) = ((((1,0),0),0),(((0,1),0),0))
             Id id2 = new Id.Node(new Id.Node(1, 0), 0);
             id2.Split().Should().Be(
                 new Id.Node(
