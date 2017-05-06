@@ -86,7 +86,7 @@ void Main()
     Console.WriteLine($"File modified on C: {fileStampOnC}");
 
     // Site C shares the change with site B
-    // There should not a conflict (concurrent stamp) between B and C.
+    // There should not be a conflict (concurrent stamp) between B and C.
     Console.WriteLine("Sync C->B");
     b.Concurrent(fileStampOnC).Should().BeFalse();
     b = b.Join(fileStampOnC);

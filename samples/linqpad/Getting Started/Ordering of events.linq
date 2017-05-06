@@ -21,7 +21,7 @@ void Main()
 
     Stamp seed = new Stamp();
 
-    Tuple<Stamp, Stamp> fork = seed.Fork();
+    (Stamp, Stamp) fork = seed.Fork();
     Process p = new Process("p", fork.Item1);
     Process q = new Process("q", fork.Item2);
 
