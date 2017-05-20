@@ -1,26 +1,30 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
     <metadata>
         <id>Itc4net</id>
-        <version>1.0.0-beta7</version>
+        <version>1.0.0-beta8</version>
         <title>Itc4net: interval tree clocks for .NET</title>
         <authors>Brant Fallin</authors>
         <owners>Brant Fallin,fallin</owners>
         <licenseUrl>http://choosealicense.com/licenses/mit/</licenseUrl>
         <projectUrl>https://github.com/fallin/Itc4net</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>A .NET (C#) implementation of Interval Tree Clocks</description>
+        <description>Itc4net is a C# implementation of Interval Tree Clocks, a causality tracking mechanism.</description>
         <summary />
+        <copyright>Copyright © 2017, Brant Fallin</copyright>
         <language>en-US</language>
         <tags>itc intervaltreeclock causality linqpad-samples</tags>
         <dependencies>
-            <dependency id="System.ValueTuple" version="4.3.0" />
+            <group targetFramework=".NETFramework4.5">
+                <dependency id="System.ValueTuple" version="4.3.1" />
+            </group>
         </dependencies>
     </metadata>
     <files>
-        <file src="src\Itc4net\bin\Release\Itc4net.dll" target="lib\net452\Itc4net.dll" />
-        <file src="src\Itc4net\bin\Release\Itc4net.xml" target="lib\net452\Itc4net.xml" />
+        <file src="src\Itc4net\bin\Release\Itc4net.dll" target="lib\net45\Itc4net.dll" />
+        <file src="src\Itc4net\bin\Release\Itc4net.xml" target="lib\net45\Itc4net.xml" />
         <file src="samples\linqpad\Getting Started\Detection of mutual inconsistency.linq" target="linqpad-samples\Getting Started\Detection of mutual inconsistency.linq" />
+        <file src="samples\linqpad\Getting Started\ITC 2008 example.linq" target="linqpad-samples\Getting Started\ITC 2008 example.linq" />
         <file src="samples\linqpad\Getting Started\Ordering of events.linq" target="linqpad-samples\Getting Started\Ordering of events.linq" />
     </files>
 </package>
