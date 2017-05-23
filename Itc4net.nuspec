@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
     <metadata>
         <id>Itc4net</id>
-        <version>1.0.0-beta8</version>
+        <version>1.0.0-beta9</version>
         <title>Itc4net: interval tree clocks for .NET</title>
         <authors>Brant Fallin</authors>
         <owners>Brant Fallin,fallin</owners>
@@ -13,7 +13,7 @@
         <summary />
         <copyright>Copyright © 2017, Brant Fallin</copyright>
         <language>en-US</language>
-        <tags>itc intervaltreeclock causality linqpad-samples</tags>
+        <tags>itc intervaltreeclock causality</tags>
         <dependencies>
             <group targetFramework=".NETFramework4.5">
                 <dependency id="System.ValueTuple" version="4.3.1" />
@@ -23,8 +23,5 @@
     <files>
         <file src="src\Itc4net\bin\Release\Itc4net.dll" target="lib\net45\Itc4net.dll" />
         <file src="src\Itc4net\bin\Release\Itc4net.xml" target="lib\net45\Itc4net.xml" />
-        <file src="samples\linqpad\Getting Started\Detection of mutual inconsistency.linq" target="linqpad-samples\Getting Started\Detection of mutual inconsistency.linq" />
-        <file src="samples\linqpad\Getting Started\ITC 2008 example.linq" target="linqpad-samples\Getting Started\ITC 2008 example.linq" />
-        <file src="samples\linqpad\Getting Started\Ordering of events.linq" target="linqpad-samples\Getting Started\Ordering of events.linq" />
     </files>
 </package>
