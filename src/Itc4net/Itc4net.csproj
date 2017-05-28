@@ -53,6 +53,7 @@
     <Compile Include="Id.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Stamp.cs" />
+    <Compile Include="StampConverter.cs" />
     <Compile Include="StampExtensions.cs" />
     <Compile Include="Binary\Decoder.cs" />
     <Compile Include="Text\Parser.cs" />

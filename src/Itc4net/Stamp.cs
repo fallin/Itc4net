@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.IO;
 using Itc4net.Binary;
@@ -9,6 +10,7 @@ namespace Itc4net
     /// <summary>
     /// An ITC stamp (logical clock)
     /// </summary>
+    [TypeConverter(typeof(StampConverter))]
     public class Stamp : IEquatable<Stamp>, IComparable<Stamp>
     {
         readonly Id _i;

@@ -71,6 +71,7 @@
     <Compile Include="IdTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScenarioTests.cs" />
+    <Compile Include="StampConverterTests.cs" />
     <Compile Include="StampExtensionsTests.cs" />
     <Compile Include="StampTests.cs" />
     <Compile Include="Text\ParserTests.cs" />
