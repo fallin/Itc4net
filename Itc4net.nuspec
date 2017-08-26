@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
     <metadata>
         <id>Itc4net</id>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
         <title>Itc4net: interval tree clocks for .NET</title>
         <authors>Brant Fallin</authors>
         <owners>Brant Fallin,fallin</owners>
@@ -16,7 +16,7 @@
         <tags>itc intervaltreeclock causality</tags>
         <dependencies>
             <group targetFramework=".NETFramework4.5">
-                <dependency id="System.ValueTuple" version="4.3.1" />
+                <dependency id="System.ValueTuple" version="4.4.0" />
             </group>
         </dependencies>
     </metadata>
