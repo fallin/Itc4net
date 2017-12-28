@@ -1,76 +1,29 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5B4D3EF8-AA65-4F8D-825D-57D58FF7F103}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Itc4net</RootNamespace>
-    <AssemblyName>Itc4net</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <Description>Itc4net is a C# implementation of Interval Tree Clocks, a causality tracking mechanism.</Description>
+    <Copyright>Copyright © 2017, Brant Fallin</Copyright>
+    <Title>Itc4net: interval tree clocks for .NET</Title>
+    <Company />
+    <Product>Itc4net</Product>
+    <Version>1.1.0</Version>
+    <Authors>fallin</Authors>
+    <PackageLicenseUrl>http://choosealicense.com/licenses/mit</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/fallin/Itc4net</PackageProjectUrl>
+    <PackageTags>itc;intervaltreeclock;causality</PackageTags>
+    <RepositoryUrl>https://github.com/fallin/Itc4net</RepositoryUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Itc4net.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Itc4net.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml" />
+    <None Remove="*.ncrunchproject" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Binary\BitProcessor.cs" />
-    <Compile Include="Binary\DecoderException.cs" />
-    <Compile Include="Binary\BitReader.cs" />
-    <Compile Include="Binary\BitWriter.cs" />
-    <Compile Include="Binary\BitWriterExtensions.cs" />
-    <Compile Include="Event.cs" />
-    <Compile Include="Id.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Stamp.cs" />
-    <Compile Include="StampConverter.cs" />
-    <Compile Include="StampExtensions.cs" />
-    <Compile Include="Binary\Decoder.cs" />
-    <Compile Include="Text\Parser.cs" />
-    <Compile Include="Text\ParserException.cs" />
-    <Compile Include="Text\Scanner.cs" />
-    <Compile Include="Text\Token.cs" />
-    <Compile Include="Text\TokenKind.cs" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>
