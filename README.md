@@ -22,7 +22,7 @@ Install using the NuGet Package Manager:
 Install-Package Itc4net
 ```
 
-#### Stamp Constructor
+#### Seed Stamp
 
 An ITC stamp is composed of two parts: an ID and event tree (i.e., casual past). The Stamp default constructor creates a *seed* stamp.
 
@@ -30,7 +30,9 @@ An ITC stamp is composed of two parts: an ID and event tree (i.e., casual past).
 Stamp seed = new Stamp(); // (1,0)
 ```
 
-Itc4net uses immutable types for the core ITC Stamp, Id, and Event classes; therefore, the ITC kernel operations (fork, join, and event) are pure functions. As a consequence, it is important to treat a Stamp like a struct type and replace the Stamp variable reference with a new reference when performing any kernel operations. 
+#### Kernel Operations and Immutability
+
+Itc4net uses immutable types for the core Stamp, Id, and Event classes; therefore, the kernel operations (fork, join, and event) are pure functions. As a consequence, it is important to treat a Stamp like a struct type and replace the Stamp variable reference with a new reference when performing any kernel operations. 
 
 For example, do this:
 
@@ -139,7 +141,6 @@ Stamp s1 = Stamp.Parse("(((1,0),0),(0,(1,1,0),0))");
 Stamp s2 = Stamp.Parse("(((0,1),0),(0,(1,0,1),0))");
     
 s1 = s1.Join(s2); // ((1,0),(0,2,0))
-s1.ToString().Dump();
 ```
 
 Illustrating with ITC graphical notation:
@@ -193,6 +194,77 @@ void ReceiveMessage(MessageBody message)
 Illustrating with ITC graphical notation:
 
 ![receive-example-diagram](docs/img/receive-example-diagram.png?raw=true)
+
+#### Initializing Timestamps
+
+##### Constructor
+
+Generally, working with a timestamp involves creating a seed stamp and using the kernel operations to manipulate the stamp. However, it can be useful to initialize a stamp with a specific value. There are several ways to accomplish this:
+
+Thanks to implicit conversion operators and C#7 tuple syntax, a stamp can be created directly using standard ITC textual representation (how cool is that?!):
+
+```c#
+Stamp s = (((1,0),0),(0,(1,1,0),0));
+```
+
+This is equivalent to:
+
+```c#
+Stamp s = new Stamp(
+    new Id.Node(
+        new Id.Node(
+            new Id.Leaf(1),
+            new Id.Leaf(0)
+        ),
+        new Id.Leaf(0)
+    ), 
+    new Event.Node(
+        0,
+        new Event.Node(
+            1,
+            new Event.Leaf(1),
+            new Event.Leaf(0)
+        ),
+        new Event.Leaf(0)
+    )
+);
+```
+
+##### Textual Representation
+
+A stamp can be converted to a string using ToString() and initialized from a string using Parse():
+
+```c#
+ Stamp s1 = (((1,0),0),(0,(1,1,0),0));
+ string text = s1.ToString(); // (((1,0),0),(0,(1,1,0),0))
+    
+ Stamp s2 = Stamp.Parse(text);
+ (s1 == s2).Should().BeTrue(); //  illustrated using the FluentAssertions library
+```
+
+Passing an invalid string representation to Parse will throw a ParseException. The exception attempts to provide useful information about why it failed:
+
+```c#
+Stamp s = Stamp.Parse("(((1,0),0),(0,(1,1,0),0)");
+//                                             ^-- missing parenthesis 
+// Note: Parse throws ParseException with the following message:
+// Error parsing "(((1,0),0),(0,(1,1,0),0)".
+// Expecting token RParen, yet found EndOfText @ index 25
+```
+
+##### Binary Representation
+
+Itc4net also implements the binary encoding described by the Interval Tree Clocks whitepaper. The binary representation provides a more compact representation which can be useful for large stamps.
+
+```c#
+Stamp s1 = (((1,0),0),(0,(1,1,0),0));
+byte[] binary = s1.ToBinary(); // A2:5B:32
+
+Stamp s2 = Stamp.FromBinary(binary);
+(s1 == s2).Should().BeTrue(); //  illustrated using the FluentAssertions library
+```
+
+The binary representation of the example stamp is only 3 bytes, which is much more compact than the 25 byte text representation (assuming the string is transmitted or stored using UTF-8/ASCII).  Subsequently, base64 encoding the binary representation only generates a 4 character string ("olsy", for this example), which again, is still much smaller than the standard textual representation.
 
 #### Other Examples
 
