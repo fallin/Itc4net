@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net45;net47</TargetFrameworks>
     <Description>Itc4net is a C# implementation of Interval Tree Clocks, a causality tracking mechanism.</Description>
     <Copyright>Copyright © 2017, Brant Fallin</Copyright>
     <Title>Itc4net: interval tree clocks for .NET</Title>
