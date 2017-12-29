@@ -18,7 +18,11 @@ for /f "usebackq tokens=1* delims=: " %%i in (`.\build\vswhere -latest -requires
 )
 
 echo info: Setup MSBuild environment
+:: This batch script modifies the current directory
+set PRESERVE_CURRENT_DIRECTORY=%~dp0
 call "%VSCOMNTOOLS%\Common7\tools\VsMSBuildCmd.bat"
+cd /d %PRESERVE_CURRENT_DIRECTORY%
+set PRESERVE_CURRENT_DIRECTORY=
 
 echo info: Build Itc4net
 msbuild.exe ".\src\Itc4net.sln" /p:Configuration=Release /t:Rebuild
