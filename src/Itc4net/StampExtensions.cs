@@ -32,11 +32,22 @@ namespace Itc4net
         /// Indicates whether the source stamp is concurrent with the other stamp.
         /// </summary>
         /// <param name="source">The source.</param>
-        /// <param name="other">The other.</param>
-        /// <returns><c>true</c> if a !--> b &amp;&amp; b !--> a, <c>false</c> otherwise. (Where "!-->" is not happends-before)</returns>
+        /// <param name="other">The other, for comparison.</param>
+        /// <returns><c>true</c> if ¬(a.leq(b)) and ¬(b.leq(a)); otherwise, <c>false</c>.</returns>
         public static bool Concurrent(this Stamp source, Stamp other)
         {
             return !source.Leq(other) && !other.Leq(source);
+        }
+
+        /// <summary>
+        /// Indicates whether the source stamp is equivalent (causally equal) with the other stamp.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="other">The other, for comparison.</param>
+        /// <returns><c>true</c> if a.leq(b) Λ b.leq(a); otherwise <c>false</c>.</returns>
+        public static bool Equivalent(this Stamp source, Stamp other)
+        {
+            return source.Leq(other) && other.Leq(source);
         }
 
         /// <summary>

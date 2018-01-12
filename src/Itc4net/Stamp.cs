@@ -110,6 +110,16 @@ namespace Itc4net
             return $"({_i},{_e})";
         }
 
+        /// <summary>Indicates whether the current object is structurally equal to another object of the same type.</summary>
+        /// <param name="other">A stamp to compare with this stamp.</param>
+        /// <returns>
+        /// true if the current object is equal to the <paramref name="other">other</paramref>
+        /// parameter; otherwise, false.
+        /// </returns>
+        /// <remarks>
+        /// This method performs a structural comparison of the entire stamp (both the id and event).
+        /// For a causal equality, use the Equivalent extension method.
+        /// </remarks>
         public bool Equals(Stamp other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -135,13 +145,11 @@ namespace Itc4net
             }
         }
 
-        /// <inheritdoc/>
         public static bool operator ==(Stamp left, Stamp right)
         {
             return Equals(left, right);
         }
 
-        /// <inheritdoc/>
         public static bool operator !=(Stamp left, Stamp right)
         {
             return !Equals(left, right);
@@ -314,7 +322,7 @@ namespace Itc4net
         ///     </item>
         ///     <item>
         ///         <term>Zero</term>
-        ///         <term>This stamp either equals or is concurrent with <paramref name="other" /></term>
+        ///         <term>This stamp is equivalent or concurrent with <paramref name="other" />.</term>
         ///     </item>
         ///     <item>
         ///         <term>Greater than zero</term>
@@ -325,29 +333,29 @@ namespace Itc4net
         /// <exception cref="System.ArgumentNullException">other</exception>
         /// <remarks>
         /// ITC stamps only provide a partial order. CompareTo returns zero when the compared
-        /// stamps are equal or concurrent. When used with Sort methods, the stamps will be
+        /// stamps are equivalent or concurrent. When used with Sort methods, the stamps will be
         /// partially ordered.
         /// </remarks>
         public int CompareTo(Stamp other)
         {
             if (other == null) throw new ArgumentNullException(nameof(other));
 
-            if (Equals(other))
+            int CompareTo(Stamp l, Stamp r)
             {
-                return 0;
+                if (l == null) throw new ArgumentNullException(nameof(l));
+                if (r == null) throw new ArgumentNullException(nameof(r));
+
+                int result = l.Leq(r)
+                    ? (r.Leq(l)
+                        ? 0         //  (l <= r) ?  (r <= l) = equivalent
+                        : -1)       //  (l <= r) ? ¬(r <= l) = lt
+                    : (r.Leq(l)
+                        ? 1         // ¬(l <= r) ?  (r <= l) = gt
+                        : 0);       // ¬(l <= r) ? ¬(r <= l) = concurrent
+                return result;
             }
 
-            if (Leq(other))
-            {
-                return -1;
-            }
-
-            if (other.Leq(this))
-            {
-                return 1;
-            }
-
-            return 0;
+            return CompareTo(this, other);
         }
 
         public static implicit operator Stamp((Id i, Event e) tuple)

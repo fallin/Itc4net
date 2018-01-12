@@ -594,6 +594,19 @@ namespace Itc4net.Tests
         }
 
         [Test]
+        public void CompareToShouldReturnZeroWhenComparingCausallyEqualStampsWithDifferentIds()
+        {
+            // Bug fix: The initial implementation used the Equal method to perform the compare
+            // as equal (0); however, that method performs a structural comparison of both the
+            // id and event. CompareTo must return 0 when 2 stamps are equivalent (causally equal).
+
+            Stamp s1 = ((1, 0), (0, 1, 0));
+            Stamp s2 = ((0, 1), (0, 1, 0));
+
+            s1.CompareTo(s2).Should().Be(0);
+        }
+
+        [Test]
         public void CompareToShouldReturnNegativeValueWhenLeftHappensBeforeRight()
         {
             Stamp s1 = new Stamp();
@@ -640,9 +653,9 @@ namespace Itc4net.Tests
             // (((0,(1,0)),(1,0)),(1,2,(0,(1,0,2),0)))
             Stamp s1 = new Stamp(
                 new Id.Node(
-                    new Id.Node(0, new Id.Node(1, 0)), 
+                    new Id.Node(0, new Id.Node(1, 0)),
                     new Id.Node(1, 0)
-                    ), 
+                    ),
                 new Event.Node(
                     1, 2, new Event.Node(0, new Event.Node(1, 0, 2), 0))
                     );
