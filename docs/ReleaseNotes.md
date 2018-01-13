@@ -1,5 +1,10 @@
 # Itc4net Release Notes
 
+Version 1.2.1
+
+- Fixes bug in Stamp.CompareTo(Stamp) method. The original implementation returned 0 (zero) if the stamps were equal or concurrent; instead, it should return true if the stamps are equivalent or concurrent. The Stamp.Equals method is a structural comparison of the ID and event components, which is useful, but is not appropriate here.
+- Added *Equivalent* extension method to Stamp class. A stamp where `(a ≤ b) Λ (b ≤ a)` is considered equivalent. That is, it returns true if two stamps represent the same causal past (ignoring the ID component).
+
 Version 1.2.0
 
 - Package now includes assemblies targeting netstandard2.0, net45, and net47.

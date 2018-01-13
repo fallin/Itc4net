@@ -7,7 +7,7 @@
     <Title>Itc4net: interval tree clocks for .NET</Title>
     <Company />
     <Product>Itc4net</Product>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <Authors>Brant Fallin</Authors>
     <PackageLicenseUrl>http://choosealicense.com/licenses/mit</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/fallin/Itc4net</PackageProjectUrl>
