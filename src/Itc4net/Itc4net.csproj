@@ -16,7 +16,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <NeutralLanguage>en-US</NeutralLanguage>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageReleaseNotes>See https://github.com/fallin/Itc4net/docs/ReleaseNotes.md</PackageReleaseNotes>
+    <PackageReleaseNotes>See https://github.com/fallin/Itc4net/blob/master/docs/ReleaseNotes.md</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
